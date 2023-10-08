@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">VAT NFC Programmer</string>
+
+    <string name="button_start_write">Write Tag</string>
+    <string name="button_cancel_write">Cancel</string>
+
+</resources>
