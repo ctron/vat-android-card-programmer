@@ -1,63 +1,46 @@
 package de.dentrassi.vat.nfc.programmer;
 
 import android.app.Activity;
-import android.nfc.NdefMessage;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public class Reader extends TagAction<NdefMessage> {
+import de.dentrassi.vat.nfc.programmer.codec.Plain;
+import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.nfc.Tools;
+
+public class Reader extends TagAction<Optional<CardId>> {
 
     private static final String TAG = "Reader";
 
     private final Tag tag;
 
-    public Reader(final Tag tag, Activity activity, final BiConsumer<NdefMessage, Exception> outcome) {
+    public Reader(final Tag tag, final Activity activity, final BiConsumer<Optional<CardId>, Exception> outcome) {
         super(tag, activity, outcome);
         this.tag = tag;
     }
 
-    protected NdefMessage process() throws Exception {
+    protected Optional<CardId> process() throws Exception {
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
         m.connect();
         try {
 
-            int block = 4;
-            int sector = -1;
+            final ByteBuffer buf = ByteBuffer.allocate(16);
+            m.authenticateSectorWithKeyA(1, MifareClassic.KEY_NFC_FORUM);
 
-            final ByteBuffer buf = ByteBuffer.allocate(m.getSize());
+            final int blockIndex = Tools.blockIndexFrom(m, 1, 0);
 
-            while (block < m.getBlockCount()) {
-                int nextSector = m.blockToSector(block);
-                if (nextSector != sector) {
-                    sector = nextSector;
-                    m.authenticateSectorWithKeyA(sector, MifareClassic.KEY_NFC_FORUM);
-                }
-
-                buf.put(m.readBlock(block));
-
-                for (int i = 0; i < 16; i++) {
-                    try {
-                        int len = buf.position() - i;
-                        final byte[] current = new byte[len];
-                        System.arraycopy(buf.array(), 0, current, 0, len);
-                        return new NdefMessage(current);
-                    } catch (final Exception e) {
-                        // continue reading
-                        Log.i(TAG, String.format("After block %s (-%s): %s", block, i, e.getMessage()));
-                    }
-                }
-
-                block++;
+            try {
+                final byte[] data = m.readBlock(blockIndex);
+                return Optional.of(Plain.decode(data));
+            } catch (Exception e) {
+                return Optional.empty();
             }
 
-            Log.i(TAG, String.format("Read: %s bytes", buf.position()));
-
-            throw new RuntimeException("Failed to decode message");
 
         } finally {
             m.close();

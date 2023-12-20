@@ -5,6 +5,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.tech.MifareClassic;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -32,5 +33,15 @@ public final class Tools {
                 Log.i(TAG, String.format("Record: %s", r));
             }
         }
+    }
+
+    public static int blockIndexFrom(final MifareClassic card, final int sector, final int blockNumber) {
+        // block index
+        int blockIndex = 0;
+        for (int i = 0; i < sector; i++) {
+            blockIndex += card.getBlockCountInSector(i);
+        }
+
+        return blockIndex;
     }
 }

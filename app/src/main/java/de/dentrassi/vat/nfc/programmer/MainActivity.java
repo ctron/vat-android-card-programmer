@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.dentrassi.vat.nfc.programmer.data.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar writeProgress;
     private boolean writeScheduled;
     private TextView writeOutcome;
-    private EditText codeInput;
+
+    private EditText memberIdInput;
+    private EditText cardNumberInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +52,12 @@ public class MainActivity extends AppCompatActivity {
         this.writeButton = findViewById(R.id.startWriteButton);
         this.writeProgress = findViewById(R.id.writeProgress);
         this.writeOutcome = findViewById(R.id.writeOutcome);
-        this.codeInput = findViewById(R.id.codeInput);
+
+        this.memberIdInput = findViewById(R.id.memberIdInput);
+        this.cardNumberInput = findViewById(R.id.cardNumberInput);
+
+        this.memberIdInput.setSelectAllOnFocus(true);
+        this.cardNumberInput.setSelectAllOnFocus(true);
 
         initNfc();
     }
@@ -73,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         if (!this.writeScheduled) {
             f.add(new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED));
         } else {
+            // we actually use the same intent
             f.add(new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED));
         }
 
@@ -121,8 +130,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (this.writeScheduled) {
                     try {
-                        String code = this.codeInput.getText().toString();
-                        new Writer(this, tag, Data.newData(code), this::writeComplete).run();
+                        CardId id = CardId.of(
+                                Integer.parseInt(this.memberIdInput.getText().toString(), 10),
+                                Integer.parseInt(this.cardNumberInput.getText().toString(), 10)
+                        );
+                        new Writer(this, tag, id, this::writeComplete).run();
                     } catch (final Exception e) {
                         Log.w(TAG, "Failed to write tag", e);
                         setTagText(String.format("Failed to write tag: %s", e.getMessage()));
@@ -132,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 break;
+
             default:
                 break;
         }
@@ -147,8 +160,17 @@ public class MainActivity extends AppCompatActivity {
         this.textView.setText(text);
     }
 
-    /// Handle a scanned NDEF tag
     private void tagScanned(@NonNull final Intent intent, @NonNull final Tag tag) {
+        new Reader(tag, this, (m, ex) -> {
+            if (ex != null) {
+                setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
+            }
+            tagRead(tag, m);
+        }).run();
+    }
+
+    /// Handle a scanned NDEF tag
+    private void tagNdefScanned(@NonNull final Intent intent, @NonNull final Tag tag) {
 
         final Parcelable[] par = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
@@ -161,23 +183,23 @@ public class MainActivity extends AppCompatActivity {
                     return Stream.empty();
                 }
             }).toArray(NdefMessage[]::new);
-            tagRead(tag, messages);
+            tagNdefRead(tag, messages);
 
         } else {
 
-            new Reader(tag, this, (m, ex) -> {
+            new NdefReader(tag, this, (m, ex) -> {
                 if (ex != null) {
                     setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
                 }
                 if (m != null) {
-                    tagRead(tag, new NdefMessage[]{m});
+                    tagNdefRead(tag, new NdefMessage[]{m});
                 }
             }).run();
 
         }
     }
 
-    private void tagRead(final Tag tag, final NdefMessage[] messages) {
+    private void tagNdefRead(final Tag tag, final NdefMessage[] messages) {
 
         final StringBuilder sb = new StringBuilder("Tag discovered.");
 
@@ -191,6 +213,24 @@ public class MainActivity extends AppCompatActivity {
         data.ifPresent(d -> {
             sb.append(String.format("Tag data: %s", d.getCode()));
         });
+
+        if (tag.getTechList() != null) {
+            if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
+                sb.append("\n\nTag can be used for access control.");
+            }
+        }
+
+        setTagText(sb.toString());
+    }
+
+    private void tagRead(final Tag tag, Optional<CardId> id) {
+        final StringBuilder sb = new StringBuilder("Tag discovered.").append("\n\n");
+
+        if (id.isPresent()) {
+            sb.append(String.format("Card Information: %s / %s", id.get().getMemberId(), id.get().getCardNumber()));
+        } else {
+            sb.append("No ID data detected");
+        }
 
         if (tag.getTechList() != null) {
             if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
