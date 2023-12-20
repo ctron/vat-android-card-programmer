@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
 
@@ -90,6 +91,9 @@ public class MainTab extends Fragment {
 
         switch (intent.getAction()) {
 
+            case NfcAdapter.ACTION_ADAPTER_STATE_CHANGED:
+                break;
+
             case NfcAdapter.ACTION_TAG_DISCOVERED:
                 final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 if (tag == null) {
@@ -128,7 +132,7 @@ public class MainTab extends Fragment {
         this.textView.setText(text);
     }
 
-    private void tagScanned(@NonNull final Intent intent, @NonNull final Tag tag) {
+    private void tagScanned(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
         new Reader(tag, (m, ex) -> {
             if (ex != null) {
                 setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
@@ -215,17 +219,7 @@ public class MainTab extends Fragment {
      * @param state the new state
      */
     private void setWriteScheduled(boolean state) {
-        setWriteScheduled(state, false);
-    }
-
-    /**
-     * Set the write-scheduled state
-     *
-     * @param state the new state
-     * @param force force the update
-     */
-    private void setWriteScheduled(boolean state, boolean force) {
-        if (!force && this.writeScheduled == state) {
+        if (this.writeScheduled == state) {
             return;
         }
 
@@ -239,7 +233,7 @@ public class MainTab extends Fragment {
         }
     }
 
-    private void writeComplete(final Void result, final Exception ex) {
+    private void writeComplete(final CreatedCard result, final Exception ex) {
         if (ex != null) {
             this.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
         } else {
@@ -247,6 +241,10 @@ public class MainTab extends Fragment {
         }
 
         setWriteScheduled(false);
+
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).addCard(result);
+        }
     }
 
     protected void onScheduleWrite(final View view) {

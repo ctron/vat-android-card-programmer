@@ -18,17 +18,33 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.list.CreatedCardsContent;
+import de.dentrassi.vat.nfc.programmer.list.ItemFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private NfcAdapter adapter;
+
     private MainTab mainTab;
+    private ItemFragment listTab;
+
+    private CreatedCardsContent cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.cards = new CreatedCardsContent(getFilesDir().toPath().resolve("cards.csv"));
+        try {
+            this.cards.load();
+        } catch (final Exception e) {
+            Log.w(TAG, "Failed to load cards", e);
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -40,12 +56,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Fragment createFragment(int position) {
                 switch (position) {
-                    case 0:
-                        MainTab result = new MainTab();
+                    case 0: {
+                        final MainTab result = new MainTab();
                         MainActivity.this.mainTab = result;
                         return result;
-                    case 1:
-                        return new ItemFragment();
+                    }
+                    case 1: {
+                        final ItemFragment result = new ItemFragment();
+                        MainActivity.this.listTab = result;
+                        return result;
+                    }
                 }
                 return null;
             }
@@ -114,4 +134,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    void notifyCardsChange() {
+        if (this.listTab != null && this.listTab.isAdded()) {
+            this.listTab.refreshItems();
+        }
+    }
+
+    void addCard(CreatedCard card) {
+        this.cards.add(card);
+
+        try {
+            this.cards.store();
+        } catch (IOException e) {
+            Log.w(TAG, "Failed to store cards", e);
+        }
+
+        this.notifyCardsChange();
+    }
+
+    public CreatedCardsContent getCards() {
+        return this.cards;
+    }
 }
