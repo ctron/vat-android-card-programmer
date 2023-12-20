@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.dentrassi.vat.nfc.programmer.nfc.Tools;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -179,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
         final StringBuilder sb = new StringBuilder("Tag discovered.");
 
-        NfcUtils.dumpTagData(messages);
+        Tools.dumpTagData(messages);
 
         final Optional<Data> data = Data.fromNdefMessage(messages);
         sb.append("\n\n");

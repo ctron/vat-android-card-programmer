@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer;
+package de.dentrassi.vat.nfc.programmer.nfc;
 
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -10,10 +10,10 @@ import android.util.Log;
 
 import com.google.common.io.BaseEncoding;
 
-public final class NfcUtils {
+public final class Tools {
     private static final String TAG = "NfcUtils";
 
-    private NfcUtils() {
+    private Tools() {
     }
 
     public static String getUid(final Intent intent) {
