@@ -1,6 +1,5 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
 import android.nfc.NdefMessage;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -15,8 +14,8 @@ public class NdefReader extends TagAction<NdefMessage> {
 
     private final Tag tag;
 
-    public NdefReader(final Tag tag, Activity activity, final BiConsumer<NdefMessage, Exception> outcome) {
-        super(tag, activity, outcome);
+    public NdefReader(final Tag tag, final BiConsumer<NdefMessage, Exception> outcome) {
+        super(tag, outcome);
         this.tag = tag;
     }
 

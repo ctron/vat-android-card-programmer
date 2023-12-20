@@ -1,6 +1,5 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.util.Log;
@@ -17,8 +16,8 @@ public class NdefWriter extends TagAction<Void> {
 
     private final Data data;
 
-    public NdefWriter(@NonNull final Activity activity, @NonNull final Tag tag, @NonNull final Data data, @NonNull final BiConsumer<Void, Exception> outcome) {
-        super(tag, activity, outcome);
+    public NdefWriter(@NonNull final Tag tag, @NonNull final Data data, @NonNull final BiConsumer<Void, Exception> outcome) {
+        super(tag, outcome);
         this.data = data;
     }
 

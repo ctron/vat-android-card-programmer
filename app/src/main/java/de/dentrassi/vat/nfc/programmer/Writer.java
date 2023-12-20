@@ -1,6 +1,5 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.util.Log;
@@ -18,8 +17,8 @@ public class Writer extends TagAction<Void> {
 
     private final CardId id;
 
-    public Writer(@NonNull final Activity activity, @NonNull final Tag tag, @NonNull final CardId id, @NonNull final BiConsumer<Void, Exception> outcome) {
-        super(tag, activity, outcome);
+    public Writer(@NonNull final Tag tag, @NonNull final CardId id, @NonNull final BiConsumer<Void, Exception> outcome) {
+        super(tag, outcome);
         this.id = id;
     }
 

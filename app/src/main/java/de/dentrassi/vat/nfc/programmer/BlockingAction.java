@@ -1,17 +1,16 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
 import java.util.function.BiConsumer;
 
 public abstract class BlockingAction<T> {
-    private final Activity activity;
     private final BiConsumer<T, Exception> handler;
 
-    protected BlockingAction(@NonNull final Activity activity, @NonNull final BiConsumer<T, Exception> handler) {
-        this.activity = activity;
+    protected BlockingAction(@NonNull final BiConsumer<T, Exception> handler) {
         this.handler = handler;
     }
 
@@ -29,7 +28,8 @@ public abstract class BlockingAction<T> {
     }
 
     private void complete(final T result, final Exception ex) {
-        this.activity.runOnUiThread(() -> {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
             this.handler.accept(result, ex);
         });
     }

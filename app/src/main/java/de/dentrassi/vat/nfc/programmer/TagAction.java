@@ -1,6 +1,5 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
 import android.nfc.Tag;
 
 import androidx.annotation.NonNull;
@@ -11,8 +10,8 @@ import java.util.function.Function;
 public abstract class TagAction<T> extends BlockingAction<T> {
     protected final Tag tag;
 
-    protected TagAction(@NonNull Tag tag, @NonNull final Activity activity, @NonNull final BiConsumer<T, Exception> handler) {
-        super(activity, handler);
+    protected TagAction(@NonNull Tag tag, @NonNull final BiConsumer<T, Exception> handler) {
+        super(handler);
         this.tag = tag;
     }
 
@@ -32,5 +31,5 @@ public abstract class TagAction<T> extends BlockingAction<T> {
         }
         throw new IllegalArgumentException(String.format("Tag not supported: %s", otherwise));
     }
-    
+
 }

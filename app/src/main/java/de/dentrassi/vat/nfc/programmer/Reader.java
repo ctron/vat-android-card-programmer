@@ -1,6 +1,5 @@
 package de.dentrassi.vat.nfc.programmer;
 
-import android.app.Activity;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
@@ -18,8 +17,8 @@ public class Reader extends TagAction<Optional<CardId>> {
 
     private final Tag tag;
 
-    public Reader(final Tag tag, final Activity activity, final BiConsumer<Optional<CardId>, Exception> outcome) {
-        super(tag, activity, outcome);
+    public Reader(final Tag tag, final BiConsumer<Optional<CardId>, Exception> outcome) {
+        super(tag, outcome);
         this.tag = tag;
     }
 
