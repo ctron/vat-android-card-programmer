@@ -4,12 +4,12 @@ public class CardId {
     /**
      * Unique ID of the member (0 to 999.999 inclusive)
      */
-    private int memberId;
+    private final int memberId;
 
     /**
      * Number of the card, only unique per-member (0 to 9.999 inclusive).
      */
-    private int cardNumber;
+    private final int cardNumber;
 
     private CardId(int memberId, int cardNumber) {
         this.memberId = memberId;

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Fragment createFragment(int position) {
                 switch (position) {
+                    default:
                     case 0: {
                         final MainTab result = new MainTab();
                         MainActivity.this.mainTab = result;
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                         return result;
                     }
                 }
-                return null;
             }
 
             @Override
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void addCard(CreatedCard card) {
+    void addCard(@NonNull final CreatedCard card) {
         this.cards.add(card);
 
         try {

@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "de.dentrassi.vat.nfc.programmer"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "de.dentrassi.vat.nfc.programmer"
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 2
         versionName = "0.0.2"
 
@@ -36,12 +36,12 @@ android {
 
 dependencies {
 
-    implementation("androidx.annotation:annotation:1.7.0")
+    implementation("androidx.annotation:annotation:1.7.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
     testImplementation("junit:junit:4.13.2")
 

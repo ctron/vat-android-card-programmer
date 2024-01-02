@@ -15,11 +15,8 @@ public class Reader extends TagAction<Optional<CardId>> {
 
     private static final String TAG = "Reader";
 
-    private final Tag tag;
-
     public Reader(final Tag tag, final BiConsumer<Optional<CardId>, Exception> outcome) {
         super(tag, outcome);
-        this.tag = tag;
     }
 
     protected Optional<CardId> process() throws Exception {

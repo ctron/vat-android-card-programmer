@@ -1,5 +1,7 @@
 package de.dentrassi.vat.nfc.programmer.list;
 
+import androidx.annotation.NonNull;
+
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriterBuilder;
@@ -36,7 +38,7 @@ public class CreatedCardsContent {
         this.entries.clear();
     }
 
-    public void add(final CreatedCard entry) {
+    public void add(@NonNull final CreatedCard entry) {
         this.entries.add(entry);
     }
 
@@ -46,7 +48,7 @@ public class CreatedCardsContent {
         try (final Reader reader = Files.newBufferedReader(this.path, StandardCharsets.UTF_8);
              final CSVReader csv = new CSVReaderBuilder(reader)
                      .withSkipLines(1)
-                     .build();) {
+                     .build()) {
 
             String[] line;
             while ((line = csv.readNext()) != null) {

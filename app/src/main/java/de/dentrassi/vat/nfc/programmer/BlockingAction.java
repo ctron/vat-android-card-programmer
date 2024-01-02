@@ -29,8 +29,6 @@ public abstract class BlockingAction<T> {
 
     private void complete(final T result, final Exception ex) {
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            this.handler.accept(result, ex);
-        });
+        handler.post(() -> this.handler.accept(result, ex));
     }
 }

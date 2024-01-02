@@ -182,9 +182,7 @@ public class MainTab extends Fragment {
         if (!data.isPresent()) {
             sb.append("No VAT data detected");
         }
-        data.ifPresent(d -> {
-            sb.append(String.format("Tag data: %s", d.getCode()));
-        });
+        data.ifPresent(d -> sb.append(String.format("Tag data: %s", d.getCode())));
 
         if (tag.getTechList() != null) {
             if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {

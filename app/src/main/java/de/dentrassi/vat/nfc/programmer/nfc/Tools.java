@@ -18,7 +18,10 @@ public final class Tools {
     }
 
     public static String getUid(final Intent intent) {
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        if (tag == null) {
+            return null;
+        }
         return BaseEncoding.base16().encode(tag.getId());
     }
 

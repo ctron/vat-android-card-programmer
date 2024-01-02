@@ -19,7 +19,7 @@ import de.dentrassi.vat.nfc.programmer.R;
  */
 public class ItemFragment extends Fragment {
 
-    private int columnCount = 1;
+    private final int columnCount = 1;
 
     private CreatedCardsContent cards;
 
