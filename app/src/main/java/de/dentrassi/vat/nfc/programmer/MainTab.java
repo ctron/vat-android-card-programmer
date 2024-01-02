@@ -28,7 +28,6 @@ import de.dentrassi.vat.nfc.programmer.data.CardId;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
-
 public class MainTab extends Fragment {
 
     private static final String TAG = "MainTab";
@@ -231,7 +230,7 @@ public class MainTab extends Fragment {
         }
     }
 
-    private void writeComplete(final CreatedCard result, final Exception ex) {
+    private void writeComplete(final @Nullable CreatedCard result, @Nullable final Exception ex) {
         if (ex != null) {
             this.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
         } else {
@@ -240,8 +239,10 @@ public class MainTab extends Fragment {
 
         setWriteScheduled(false);
 
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).addCard(result);
+        if (result != null) {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).addCard(result);
+            }
         }
     }
 

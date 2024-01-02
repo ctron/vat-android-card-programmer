@@ -23,12 +23,12 @@ public abstract class TagAction<T> extends BlockingAction<T> {
      * @param <U>       The actual type
      * @return The tag specific instance.
      */
-    @NonNull
-    protected <U> U getTagAs(Function<Tag, U> getter, String otherwise) {
+    protected <U> @NonNull U getTagAs(@NonNull Function<Tag, U> getter, @NonNull String otherwise) {
         final U tag = getter.apply(this.tag);
         if (tag != null) {
             return tag;
         }
+        
         throw new IllegalArgumentException(String.format("Tag not supported: %s", otherwise));
     }
 

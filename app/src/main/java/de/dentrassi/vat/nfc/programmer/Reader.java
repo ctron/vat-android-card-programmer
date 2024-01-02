@@ -3,7 +3,6 @@ package de.dentrassi.vat.nfc.programmer;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 
-import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -25,7 +24,6 @@ public class Reader extends TagAction<Optional<CardId>> {
         m.connect();
         try {
 
-            final ByteBuffer buf = ByteBuffer.allocate(16);
             m.authenticateSectorWithKeyA(1, MifareClassic.KEY_NFC_FORUM);
 
             final int blockIndex = Tools.blockIndexFrom(m, 1, 0);

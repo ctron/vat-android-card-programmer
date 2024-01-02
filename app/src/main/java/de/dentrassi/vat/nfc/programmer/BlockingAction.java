@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.function.BiConsumer;
 
@@ -14,7 +15,7 @@ public abstract class BlockingAction<T> {
         this.handler = handler;
     }
 
-    protected abstract T process() throws Exception;
+    protected abstract @Nullable T process() throws Exception;
 
     public void run() {
         new Thread(() -> {
