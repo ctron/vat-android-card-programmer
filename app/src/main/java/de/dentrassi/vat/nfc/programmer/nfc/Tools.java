@@ -38,13 +38,13 @@ public final class Tools {
         }
     }
 
-    public static int blockIndexFrom(final MifareClassic card, final int sector, final int blockNumber) {
+    public static int blockIndexFrom(final MifareClassic card, final int sector, final Block block) {
         // block index
         int blockIndex = 0;
         for (int i = 0; i < sector; i++) {
             blockIndex += card.getBlockCountInSector(i);
         }
 
-        return blockIndex;
+        return blockIndex + block.blockNumber();
     }
 }

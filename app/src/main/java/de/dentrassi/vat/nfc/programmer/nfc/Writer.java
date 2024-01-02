@@ -35,30 +35,34 @@ public class Writer {
     }
 
     private void performInternal() throws Exception {
-        // writeAccess();
+        writeAccess();
         writeId();
     }
 
-    private void writeAccess(int sector) {
+    private void writeAccess() throws IOException {
 
-        // A = not used
-        // B = private key
-
-        final BlockBits dataBlockBits = new BlockBits(false, true, true);
-        final BlockBits trailerBlockBits = new BlockBits(false, true, true);
+        // Key A: read-only
+        // Key B: read-write
 
         final AccessBits accessBits = new AccessBits();
-        accessBits.setBlockBits(AccessBits.Block.First, dataBlockBits);
-        accessBits.setBlockBits(AccessBits.Block.Fourth, trailerBlockBits);
 
+        accessBits.setBlockBits(Block.Block0, new BlockBits(1, 0, 0));
+        accessBits.setBlockBits(Block.Block1, new BlockBits(0, 0, 0));
+        accessBits.setBlockBits(Block.Block2, new BlockBits(0, 0, 0));
+        accessBits.setBlockBits(Block.Block3, new BlockBits(0, 1, 1));
+
+        final byte[] data = SectorTrailer.of(this.keys, accessBits).encode();
+        final int blockIndex = Tools.blockIndexFrom(this.card, this.sector, Block.Block3);
+
+        this.card.authenticateSectorWithKeyB(this.sector, this.keys.getB().getKey());
+        this.card.writeBlock(blockIndex, data);
     }
 
     private void writeId() throws IOException {
-
-        final int blockIndex = Tools.blockIndexFrom(this.card, this.sector, 0);
+        final int blockIndex = Tools.blockIndexFrom(this.card, this.sector, Block.Block0);
         byte[] data = Plain.encode(this.id);
 
-        this.card.authenticateSectorWithKeyA(this.sector, this.keys.getA().getKey());
+        this.card.authenticateSectorWithKeyB(this.sector, this.keys.getB().getKey());
         this.card.writeBlock(blockIndex, data);
     }
 }

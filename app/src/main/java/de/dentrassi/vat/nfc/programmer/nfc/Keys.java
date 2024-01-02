@@ -10,13 +10,17 @@ public class Keys {
     }
 
     public Key getA() {
-        return a;
+        return this.a;
     }
 
     public Key getB() {
-        return b;
+        return this.b;
     }
 
+    /**
+     * @deprecated should never be used
+     */
+    @Deprecated
     public static Keys defaultKeys() {
         // FIXME: remove this key and make it configurable
         return new Keys(Key.nfcForum(), Key.fromString("AABBCCDDEEFF"));

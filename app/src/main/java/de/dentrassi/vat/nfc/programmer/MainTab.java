@@ -105,7 +105,7 @@ public class MainTab extends Fragment {
                                 Integer.parseInt(this.memberIdInput.getText().toString(), 10),
                                 Integer.parseInt(this.cardNumberInput.getText().toString(), 10)
                         );
-                        new Writer(tag, id, this::writeComplete).run();
+                        new WriteAction(tag, id, this::writeComplete).run();
                     } catch (final Exception e) {
                         Log.w(TAG, "Failed to write tag", e);
                         setTagText(String.format("Failed to write tag: %s", e.getMessage()));
@@ -132,7 +132,7 @@ public class MainTab extends Fragment {
     }
 
     private void tagScanned(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
-        new Reader(tag, (m, ex) -> {
+        new ReadAction(tag, (m, ex) -> {
             if (ex != null) {
                 setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
             }

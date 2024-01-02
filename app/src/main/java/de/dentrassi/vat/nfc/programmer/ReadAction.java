@@ -8,13 +8,14 @@ import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.codec.Plain;
 import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.nfc.Block;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
-public class Reader extends TagAction<Optional<CardId>> {
+public class ReadAction extends TagAction<Optional<CardId>> {
 
     private static final String TAG = "Reader";
 
-    public Reader(final Tag tag, final BiConsumer<Optional<CardId>, Exception> outcome) {
+    public ReadAction(final Tag tag, final BiConsumer<Optional<CardId>, Exception> outcome) {
         super(tag, outcome);
     }
 
@@ -26,7 +27,7 @@ public class Reader extends TagAction<Optional<CardId>> {
 
             m.authenticateSectorWithKeyA(1, MifareClassic.KEY_NFC_FORUM);
 
-            final int blockIndex = Tools.blockIndexFrom(m, 1, 0);
+            final int blockIndex = Tools.blockIndexFrom(m, 1, Block.Block0);
 
             try {
                 final byte[] data = m.readBlock(blockIndex);

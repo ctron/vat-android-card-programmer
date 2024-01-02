@@ -16,6 +16,9 @@ public class AccessBits {
         public boolean c2;
         public boolean c3;
 
+        /**
+         * Default constructor, all bits false.
+         */
         public BlockBits() {
         }
 
@@ -23,6 +26,15 @@ public class AccessBits {
             this.c1 = c1;
             this.c2 = c2;
             this.c3 = c3;
+        }
+
+        /**
+         * Convenience constructor, for using ints as the most documentations do
+         */
+        public BlockBits(int c1, int c2, int c3) {
+            this.c1 = c1 != 0;
+            this.c2 = c2 != 0;
+            this.c3 = c3 != 0;
         }
 
         @NonNull
@@ -67,10 +79,6 @@ public class AccessBits {
         }
     }
 
-    public enum Block {
-        First, Second, Third, Fourth,
-    }
-
     private final byte[] bits;
 
     public AccessBits() {
@@ -82,30 +90,30 @@ public class AccessBits {
     }
 
     public void setBits(@NonNull Bits bits) {
-        setBlockBits(Block.First, bits.block0);
-        setBlockBits(Block.Second, bits.block1);
-        setBlockBits(Block.Third, bits.block2);
-        setBlockBits(Block.Fourth, bits.block3);
+        setBlockBits(Block.Block0, bits.block0);
+        setBlockBits(Block.Block1, bits.block1);
+        setBlockBits(Block.Block2, bits.block2);
+        setBlockBits(Block.Block3, bits.block3);
     }
 
     public void setBlockBits(@NonNull Block block, @NonNull BlockBits bits) {
         switch (block) {
-            case First:
+            case Block0:
                 setBit(bits.c1, 1, 4, 0, 0);
                 setBit(bits.c2, 2, 0, 0, 4);
                 setBit(bits.c3, 2, 4, 1, 0);
                 break;
-            case Second:
+            case Block1:
                 setBit(bits.c1, 1, 5, 0, 1);
                 setBit(bits.c2, 2, 1, 0, 5);
                 setBit(bits.c3, 2, 5, 1, 1);
                 break;
-            case Third:
+            case Block2:
                 setBit(bits.c1, 1, 6, 0, 2);
                 setBit(bits.c2, 2, 2, 0, 6);
                 setBit(bits.c3, 2, 6, 1, 2);
                 break;
-            case Fourth:
+            case Block3:
                 setBit(bits.c1, 1, 7, 0, 3);
                 setBit(bits.c2, 2, 3, 0, 7);
                 setBit(bits.c3, 2, 7, 1, 3);
@@ -115,25 +123,25 @@ public class AccessBits {
 
     public @NonNull BlockBits getBlockBits(@NonNull Block block) {
         switch (block) {
-            case First: {
+            case Block0: {
                 boolean c1 = getBit(1, 4);
                 boolean c2 = getBit(2, 0);
                 boolean c3 = getBit(2, 4);
                 return new BlockBits(c1, c2, c3);
             }
-            case Second: {
+            case Block1: {
                 boolean c1 = getBit(1, 5);
                 boolean c2 = getBit(2, 1);
                 boolean c3 = getBit(2, 5);
                 return new BlockBits(c1, c2, c3);
             }
-            case Third: {
+            case Block2: {
                 boolean c1 = getBit(1, 6);
                 boolean c2 = getBit(2, 2);
                 boolean c3 = getBit(2, 6);
                 return new BlockBits(c1, c2, c3);
             }
-            case Fourth: {
+            case Block3: {
                 boolean c1 = getBit(1, 7);
                 boolean c2 = getBit(2, 3);
                 boolean c3 = getBit(2, 7);
@@ -146,10 +154,10 @@ public class AccessBits {
 
     public @NonNull Bits getBits() {
         return new Bits(
-                getBlockBits(Block.First),
-                getBlockBits(Block.Second),
-                getBlockBits(Block.Third),
-                getBlockBits(Block.Fourth)
+                getBlockBits(Block.Block0),
+                getBlockBits(Block.Block1),
+                getBlockBits(Block.Block2),
+                getBlockBits(Block.Block3)
         );
     }
 
@@ -171,7 +179,7 @@ public class AccessBits {
     }
 
     public @NonNull byte[] getRawBits() {
-        return bits.clone();
+        return this.bits.clone();
     }
 
     public byte getUserData() {
@@ -182,6 +190,7 @@ public class AccessBits {
         if (bits.length != 4) {
             throw new IllegalArgumentException("Access bits must have a length of 4 bits");
         }
+
         return new AccessBits(bits);
     }
 
@@ -197,5 +206,11 @@ public class AccessBits {
                 .add("bits", getBits())
                 .add("userData", getUserData())
                 .toString();
+    }
+
+    @NonNull
+    @Override
+    public AccessBits clone() {
+        return new AccessBits(this.bits.clone());
     }
 }

@@ -13,14 +13,15 @@ import java.util.function.BiConsumer;
 import de.dentrassi.vat.nfc.programmer.data.CardId;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
+import de.dentrassi.vat.nfc.programmer.nfc.Writer;
 
-public class Writer extends TagAction<CreatedCard> {
+public class WriteAction extends TagAction<CreatedCard> {
 
     private static final String TAG = "Writer";
 
     private final CardId id;
 
-    public Writer(@NonNull final Tag tag, @NonNull final CardId id, @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
+    public WriteAction(@NonNull final Tag tag, @NonNull final CardId id, @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
         super(tag, outcome);
         this.id = id;
     }
@@ -30,7 +31,7 @@ public class Writer extends TagAction<CreatedCard> {
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
-        new de.dentrassi.vat.nfc.programmer.nfc.Writer(m, Keys.defaultKeys(), this.id, 1)
+        new Writer(m, Keys.defaultKeys(), this.id, 1)
                 .perform();
 
         final String uid = BaseEncoding.base16().encode(m.getTag().getId());
