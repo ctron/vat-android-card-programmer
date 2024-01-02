@@ -34,6 +34,7 @@ public class CreatedCardsContent {
         return UnmodifiableList.unmodifiableList(this.entries);
     }
 
+    @SuppressWarnings("unused")
     public void clear() {
         this.entries.clear();
     }

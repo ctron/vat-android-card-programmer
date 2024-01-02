@@ -1,28 +1,15 @@
 package de.dentrassi.vat.nfc.programmer.nfc;
 
-import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Parcelable;
 import android.util.Log;
-
-import com.google.common.io.BaseEncoding;
 
 public final class Tools {
     private static final String TAG = "NfcUtils";
 
     private Tools() {
-    }
-
-    public static String getUid(final Intent intent) {
-        final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        if (tag == null) {
-            return null;
-        }
-        return BaseEncoding.base16().encode(tag.getId());
     }
 
     public static void dumpTagData(final Parcelable[] messages) {

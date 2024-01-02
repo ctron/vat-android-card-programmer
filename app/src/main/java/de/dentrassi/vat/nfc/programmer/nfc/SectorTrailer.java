@@ -18,7 +18,7 @@ public class SectorTrailer {
     }
 
     public static SectorTrailer of(final Keys keys, final AccessBits accessBits) {
-        return new SectorTrailer(keys.getA(), accessBits.clone(), keys.getB());
+        return new SectorTrailer(keys.getA(), accessBits.copy(), keys.getB());
     }
 
     public @NonNull byte[] encode() {

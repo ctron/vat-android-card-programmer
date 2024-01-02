@@ -19,6 +19,7 @@ public class AccessBits {
         /**
          * Default constructor, all bits false.
          */
+        @SuppressWarnings("unused")
         public BlockBits() {
         }
 
@@ -57,6 +58,7 @@ public class AccessBits {
         public BlockBits block2;
         public BlockBits block3;
 
+        @SuppressWarnings("unused")
         public Bits() {
         }
 
@@ -89,7 +91,8 @@ public class AccessBits {
         this.bits = bits;
     }
 
-    public void setBits(@NonNull Bits bits) {
+    @SuppressWarnings("unused")
+    public void setBits(@NonNull final Bits bits) {
         setBlockBits(Block.Block0, bits.block0);
         setBlockBits(Block.Block1, bits.block1);
         setBlockBits(Block.Block2, bits.block2);
@@ -209,8 +212,7 @@ public class AccessBits {
     }
 
     @NonNull
-    @Override
-    public AccessBits clone() {
+    public AccessBits copy() {
         return new AccessBits(this.bits.clone());
     }
 }

@@ -13,8 +13,6 @@ import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
 public class ReadAction extends TagAction<Optional<CardId>> {
 
-    private static final String TAG = "Reader";
-
     public ReadAction(final Tag tag, final BiConsumer<Optional<CardId>, Exception> outcome) {
         super(tag, outcome);
     }
