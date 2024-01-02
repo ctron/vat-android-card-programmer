@@ -97,19 +97,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initNfc() {
-        final NfcManager manager = (NfcManager) getSystemService(Context.NFC_SERVICE);
-        this.adapter = manager.getDefaultAdapter();
+        final Object manager = getSystemService(Context.NFC_SERVICE);
+        if (manager instanceof NfcManager) {
+            this.adapter = ((NfcManager) manager).getDefaultAdapter();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        this.enableForegroundDispatch();
+        enableForegroundDispatch();
+    }
+
+    @Override
+    public void onPause() {
+        disableForegroundDispatch();
+        super.onPause();
     }
 
     private void enableForegroundDispatch() {
-        Intent intent = new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE);
+        if (this.adapter == null) {
+            return;
+        }
+
+        final Intent intent = new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE);
 
         final ArrayList<IntentFilter> f = new ArrayList<>();
         f.add(new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED));
@@ -117,10 +129,10 @@ public class MainActivity extends AppCompatActivity {
         this.adapter.enableForegroundDispatch(this, pendingIntent, f.toArray(new IntentFilter[0]), null);
     }
 
-    @Override
-    public void onPause() {
-        this.adapter.disableForegroundDispatch(this);
-        super.onPause();
+    private void disableForegroundDispatch() {
+        if (this.adapter != null) {
+            this.adapter.disableForegroundDispatch(this);
+        }
     }
 
     @Override
@@ -149,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, "Failed to store cards", e);
         }
 
-        this.notifyCardsChange();
+        notifyCardsChange();
     }
 
     public CreatedCardsContent getCards() {
