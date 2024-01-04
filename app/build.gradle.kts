@@ -50,4 +50,5 @@ dependencies {
 
     implementation("com.google.guava:guava:32.1.2-android")
     implementation("com.opencsv:opencsv:5.9")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

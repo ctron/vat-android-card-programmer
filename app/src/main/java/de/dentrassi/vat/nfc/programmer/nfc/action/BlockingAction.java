@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer;
+package de.dentrassi.vat.nfc.programmer.nfc.action;
 
 import android.os.Handler;
 import android.os.Looper;

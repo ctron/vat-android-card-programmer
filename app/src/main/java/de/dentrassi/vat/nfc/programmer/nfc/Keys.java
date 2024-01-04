@@ -1,5 +1,7 @@
 package de.dentrassi.vat.nfc.programmer.nfc;
 
+import java.util.Objects;
+
 public class Keys {
     private final Key a;
     private final Key b;
@@ -17,12 +19,16 @@ public class Keys {
         return this.b;
     }
 
-    /**
-     * @deprecated should never be used
-     */
-    @Deprecated
-    public static Keys defaultKeys() {
-        // FIXME: remove this key and make it configurable
-        return new Keys(Key.nfcForum(), Key.fromString("AABBCCDDEEFF"));
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Keys keys = (Keys) o;
+        return Objects.equals(a, keys.a) && Objects.equals(b, keys.b);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b);
     }
 }

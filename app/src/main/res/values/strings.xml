@@ -3,7 +3,9 @@
 
     <string name="button_start_write">Write Tag</string>
     <string name="button_cancel_write">Cancel</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="import_configuration">Import Configuration</string>
+    <string name="unset">Unset</string>
+    <string name="text_user">User</string>
+    <string name="text_member">Member</string>
 
 </resources>

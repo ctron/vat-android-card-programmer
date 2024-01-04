@@ -19,53 +19,55 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+        <TableLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Mitglied" />
+            <TableRow>
 
-            <EditText
-                android:id="@+id/memberIdInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="Mitglied"
-                android:inputType="number"
-                android:singleLine="true"
-                android:maxLength="6"
-                android:text="000000" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_member"
+                    android:textAppearance="@android:style/TextAppearance.Material.Widget" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/memberIdInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Mitglied"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:maxLength="6"
+                    android:text="000000" />
+            </TableRow>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Benutzer" />
+            <TableRow>
 
-            <EditText
-                android:id="@+id/cardNumberInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="Benutzer"
-                android:inputType="number"
-                android:singleLine="true"
-                android:maxLength="4"
-                android:text="0001" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/text_user"
+                    android:textAppearance="@android:style/TextAppearance.Material.Widget" />
+
+                <EditText
+                    android:id="@+id/cardNumberInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Benutzer"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:maxLength="4"
+                    android:text="0001" />
+            </TableRow>
+
+        </TableLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

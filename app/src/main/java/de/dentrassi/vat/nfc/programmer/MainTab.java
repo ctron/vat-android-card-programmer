@@ -20,13 +20,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.data.CardId;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
+import de.dentrassi.vat.nfc.programmer.nfc.action.Data;
+import de.dentrassi.vat.nfc.programmer.nfc.action.NdefReader;
+import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
+import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
 
 public class MainTab extends Fragment {
 
@@ -47,10 +55,7 @@ public class MainTab extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // return super.onCreateView(inflater, container, savedInstanceState);
-
         final View view = inflater.inflate(R.layout.main_fragment, container, false);
-
 
         this.textView = view.findViewById(R.id.tagOutput);
         this.writeButton = view.findViewById(R.id.startWriteButton);
@@ -67,7 +72,6 @@ public class MainTab extends Fragment {
 
         return view;
     }
-
 
     protected void onNewIntent(final Intent intent) {
         Log.i(TAG, String.format("New Intent: %s", intent));
@@ -101,11 +105,16 @@ public class MainTab extends Fragment {
 
                 if (this.writeScheduled) {
                     try {
-                        CardId id = CardId.of(
+                        final CardId id = CardId.of(
                                 Integer.parseInt(this.memberIdInput.getText().toString(), 10),
                                 Integer.parseInt(this.cardNumberInput.getText().toString(), 10)
                         );
-                        new WriteAction(tag, id, this::writeComplete).run();
+                        final Keys keys = getConfiguration().getKeys().get("VAT");
+                        if (keys == null) {
+                            setTagText("No keys present for writing");
+                            return;
+                        }
+                        new WriteAction(tag, keys, id, this::writeComplete).run();
                     } catch (final Exception e) {
                         Log.w(TAG, "Failed to write tag", e);
                         setTagText(String.format("Failed to write tag: %s", e.getMessage()));
@@ -132,7 +141,13 @@ public class MainTab extends Fragment {
     }
 
     private void tagScanned(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
-        new ReadAction(tag, (m, ex) -> {
+        final Keys keys = getConfiguration().getKeys().get("VAT");
+        if (keys == null) {
+            setTagText("Missing configuration");
+            return;
+        }
+
+        new ReadAction(tag, keys, (m, ex) -> {
             if (ex != null) {
                 setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
             }
@@ -246,13 +261,31 @@ public class MainTab extends Fragment {
         }
     }
 
+    protected @NotNull Configuration getConfiguration() {
+        if (getActivity() instanceof MainActivity) {
+            return ((MainActivity) getActivity()).getConfiguration();
+        } else {
+            return new Configuration();
+        }
+    }
+
     protected void onScheduleWrite(final View view) {
         if (!this.writeScheduled) {
-            this.writeOutcome.setText("");
-            setWriteScheduled(true);
+            scheduleWrite();
         } else {
             writeComplete(null, new RuntimeException("Write cancelled"));
         }
+    }
+
+    protected void scheduleWrite() {
+
+        if (getConfiguration().getKeys().get("VAT") == null) {
+            this.writeOutcome.setText("Keys not configured");
+            return;
+        }
+
+        this.writeOutcome.setText("");
+        setWriteScheduled(true);
     }
 
 }

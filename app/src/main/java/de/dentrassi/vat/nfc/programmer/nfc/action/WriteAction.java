@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer;
+package de.dentrassi.vat.nfc.programmer.nfc.action;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
@@ -17,13 +17,18 @@ import de.dentrassi.vat.nfc.programmer.nfc.Writer;
 
 public class WriteAction extends TagAction<CreatedCard> {
 
-    private static final String TAG = "Writer";
+    private static final String TAG = WriteAction.class.getName();
 
+    private final Keys keys;
     private final CardId id;
 
-    public WriteAction(@NonNull final Tag tag, @NonNull final CardId id, @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
+    public WriteAction(@NonNull final Tag tag,
+                       @NonNull final Keys keys,
+                       @NonNull final CardId id,
+                       @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
         super(tag, outcome);
         this.id = id;
+        this.keys = keys;
     }
 
     protected CreatedCard process() throws Exception {
@@ -31,7 +36,7 @@ public class WriteAction extends TagAction<CreatedCard> {
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
-        new Writer(m, Keys.defaultKeys(), this.id, 1)
+        new Writer(m, this.keys, this.id, 1)
                 .perform();
 
         final String uid = BaseEncoding.base16().encode(m.getTag().getId());

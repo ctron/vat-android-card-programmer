@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer;
+package de.dentrassi.vat.nfc.programmer.nfc.action;
 
 import android.nfc.Tag;
 
@@ -28,7 +28,7 @@ public abstract class TagAction<T> extends BlockingAction<T> {
         if (tag != null) {
             return tag;
         }
-        
+
         throw new IllegalArgumentException(String.format("Tag not supported: %s", otherwise));
     }
 

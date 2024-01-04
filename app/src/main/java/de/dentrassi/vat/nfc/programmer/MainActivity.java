@@ -4,11 +4,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -18,9 +22,15 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
+import de.dentrassi.vat.nfc.programmer.config.ConfigTab;
+import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCardsContent;
 import de.dentrassi.vat.nfc.programmer.list.ItemFragment;
@@ -32,8 +42,12 @@ public class MainActivity extends AppCompatActivity {
 
     private MainTab mainTab;
     private ItemFragment listTab;
+    private ConfigTab configTab;
 
     private CreatedCardsContent cards;
+    private Configuration configuration;
+
+    private final ActivityResultLauncher<String> importConfig = registerForActivityResult(new ActivityResultContracts.GetContent(), this::performImportConfig);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (final Exception e) {
             Log.w(TAG, "Failed to load cards", e);
         }
+
+        this.configuration = Configuration.load(getConfigPath());
 
         setContentView(R.layout.activity_main);
 
@@ -67,12 +83,17 @@ public class MainActivity extends AppCompatActivity {
                         MainActivity.this.listTab = result;
                         return result;
                     }
+                    case 2: {
+                        final ConfigTab result = new ConfigTab();
+                        MainActivity.this.configTab = result;
+                        return result;
+                    }
                 }
             }
 
             @Override
             public int getItemCount() {
-                return 2;
+                return 3;
             }
         });
 
@@ -87,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
                         case 1:
                             tab.setText("Data");
                             break;
+                        case 2:
+                            tab.setText("Config");
+                            break;
                     }
                 }
         )
@@ -94,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         initNfc();
+    }
+
+    private @NotNull Path getConfigPath() {
+        return getFilesDir().toPath().resolve("config.json");
     }
 
     private void initNfc() {
@@ -166,5 +194,25 @@ public class MainActivity extends AppCompatActivity {
 
     public CreatedCardsContent getCards() {
         return this.cards;
+    }
+
+    public @NotNull Configuration getConfiguration() {
+        return this.configuration;
+    }
+
+    public void importConfig() {
+        this.importConfig.launch("application/json");
+    }
+
+    private void performImportConfig(final Uri uri) {
+        try (final InputStream in = getContentResolver().openInputStream(uri)) {
+            this.configuration = Configuration.load(in);
+            this.configuration.store(getConfigPath());
+            Toast.makeText(this, "Configuration imported", Toast.LENGTH_SHORT).show();
+            this.configTab.configChanged();
+        } catch (final Exception e) {
+            Log.w(TAG, "Failed to import configuration", e);
+            Toast.makeText(this, String.format("Import failed: " + e), Toast.LENGTH_LONG).show();
+        }
     }
 }
