@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.google.common.io.BaseEncoding;
 
+import java.time.ZonedDateTime;
 import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.data.CardId;
@@ -41,7 +42,9 @@ public class WriteAction extends TagAction<CreatedCard> {
 
         final String uid = BaseEncoding.base16().encode(m.getTag().getId());
 
-        return new CreatedCard(uid, id);
+        final ZonedDateTime timestamp = ZonedDateTime.now();
+
+        return new CreatedCard(uid, id, timestamp);
     }
 
 }

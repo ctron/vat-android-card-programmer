@@ -33,7 +33,7 @@ import de.dentrassi.vat.nfc.programmer.config.ConfigTab;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.list.CreatedCardsContent;
-import de.dentrassi.vat.nfc.programmer.list.ItemFragment;
+import de.dentrassi.vat.nfc.programmer.list.ListFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private NfcAdapter adapter;
 
     private MainTab mainTab;
-    private ItemFragment listTab;
+    private ListFragment listTab;
     private ConfigTab configTab;
 
     private CreatedCardsContent cards;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.cards = new CreatedCardsContent(getFilesDir().toPath().resolve("cards.csv"));
+        this.cards = new CreatedCardsContent(getFilesDir().toPath());
         try {
             this.cards.load();
         } catch (final Exception e) {
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                         return result;
                     }
                     case 1: {
-                        final ItemFragment result = new ItemFragment();
+                        final ListFragment result = new ListFragment();
                         MainActivity.this.listTab = result;
                         return result;
                     }
