@@ -96,12 +96,12 @@ public class ListFragment extends Fragment {
 
     private void clearData() {
         new AlertDialog.Builder(getActivity())
-                .setTitle("Clearing data")
-                .setMessage("This will clear all recorded cards.")
-                .setPositiveButton("Ok", (dialog, which) -> {
+                .setTitle(R.string.title_clearing_data)
+                .setMessage(R.string.message_clearing_data)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     performClearData();
                 })
-                .setNegativeButton("Cancel", (dialog, which) -> {
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
                 })
                 .create()
                 .show();

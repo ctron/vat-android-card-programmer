@@ -7,5 +7,9 @@
     <string name="unset">Unset</string>
     <string name="text_user">User</string>
     <string name="text_member">Member</string>
+    <string name="title_write_tag">Write Tag</string>
+    <string name="title_read_tag">Read Tag</string>
+    <string name="title_clearing_data">Clearing data</string>
+    <string name="message_clearing_data">This will clear all recorded cards.</string>
 
 </resources>

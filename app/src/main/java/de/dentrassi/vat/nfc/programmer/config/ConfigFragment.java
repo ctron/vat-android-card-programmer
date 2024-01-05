@@ -27,7 +27,7 @@ public class ConfigFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.config, container, false);
+        final View view = inflater.inflate(R.layout.config_fragment, container, false);
 
         final Button importButton = view.findViewById(R.id.importConfig);
         importButton.setOnClickListener(this::onImportConfig);

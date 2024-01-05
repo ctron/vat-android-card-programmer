@@ -15,9 +15,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Write Tag"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="@string/title_write_tag"
+            android:layout_margin="@dimen/text_margin"
+            android:theme="@style/TextAppearance.Material3.HeadlineMedium" />
 
         <TableLayout
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Mitglied"
+                    android:hint="@string/text_member"
                     android:inputType="number"
                     android:singleLine="true"
                     android:maxLength="6"
@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Benutzer"
+                    android:hint="@string/text_user"
                     android:inputType="number"
                     android:singleLine="true"
                     android:maxLength="4"
@@ -107,9 +107,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Read Tag"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="@string/title_read_tag"
+            android:layout_margin="@dimen/text_margin"
+            android:theme="@style/TextAppearance.Material3.HeadlineMedium" />
 
         <TextView
             android:id="@+id/tagOutput"

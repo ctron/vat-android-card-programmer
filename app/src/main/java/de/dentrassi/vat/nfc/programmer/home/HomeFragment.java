@@ -57,7 +57,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.main_fragment, container, false);
+        final View view = inflater.inflate(R.layout.home_fragment, container, false);
 
         this.textView = view.findViewById(R.id.tagOutput);
         this.writeButton = view.findViewById(R.id.startWriteButton);
