@@ -52,3 +52,10 @@ dependencies {
     implementation("com.opencsv:opencsv:5.9")
     implementation("com.google.code.gson:gson:2.10.1")
 }
+
+afterEvaluate {
+    tasks.withType(JavaCompile::class) {
+        options.compilerArgs.add("-Xlint:unchecked")
+        options.compilerArgs.add("-Xlint:deprecation")
+    }
+}
