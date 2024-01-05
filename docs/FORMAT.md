@@ -9,6 +9,27 @@ Sector 1 is used by VAT only.
 To be checked: Other users can use other sectors, as defined by the MAD in sector 0. But for now,
 VAT is expected to be present in sector 1.
 
+### Data
+
+Built with: http://corkami.github.io/sbud/hexii.html
+
+```
+hexii: [
+    "000001", "0001", 0, 0, 0, 0, 0, 0,
+    35, 219, 197, 221, 77, 118, 73, 117, 158, 161, 169, 211, 89, 3, 187, 40,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+],
+descriptions: [
+    [6, "Member ID", "1"],
+    [4, "User Number", "1"],
+    [6, "Future use", ""],
+    [16, "Card UID", "23dbc5dd-4d76-4975-9ea1-a9d35903bb28"],
+    [16, "Future use", ""],
+],
+```
+
+![](sector1.svg)
+
 ### Access control
 
 **Key A:** read-only, used by card reader
