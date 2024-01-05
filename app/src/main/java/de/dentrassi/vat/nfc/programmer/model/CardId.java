@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer.data;
+package de.dentrassi.vat.nfc.programmer.model;
 
 public class CardId {
     /**

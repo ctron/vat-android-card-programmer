@@ -16,12 +16,12 @@ import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 
-public class ConfigTab extends Fragment {
+public class ConfigFragment extends Fragment {
 
     private TextView vatKeyA;
     private TextView vatKeyB;
 
-    public ConfigTab() {
+    public ConfigFragment() {
     }
 
     @Nullable

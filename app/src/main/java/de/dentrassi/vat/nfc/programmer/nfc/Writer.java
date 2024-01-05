@@ -8,7 +8,7 @@ import android.util.Log;
 import java.io.IOException;
 
 import de.dentrassi.vat.nfc.programmer.codec.Plain;
-import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 
 /**
  * Write information to card

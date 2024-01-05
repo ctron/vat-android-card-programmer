@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer;
+package de.dentrassi.vat.nfc.programmer.home;
 
 import android.content.Intent;
 import android.nfc.NdefMessage;
@@ -26,9 +26,11 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import de.dentrassi.vat.nfc.programmer.MainActivity;
+import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
-import de.dentrassi.vat.nfc.programmer.data.CardId;
-import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 import de.dentrassi.vat.nfc.programmer.nfc.action.Data;
@@ -36,7 +38,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.action.NdefReader;
 import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
 
-public class MainTab extends Fragment {
+public class HomeFragment extends Fragment {
 
     private static final String TAG = "MainTab";
 
@@ -49,7 +51,7 @@ public class MainTab extends Fragment {
     private EditText memberIdInput;
     private EditText cardNumberInput;
 
-    public MainTab() {
+    public HomeFragment() {
     }
 
     @Nullable
@@ -73,7 +75,7 @@ public class MainTab extends Fragment {
         return view;
     }
 
-    protected void onNewIntent(final Intent intent) {
+    public void onNewIntent(final Intent intent) {
         Log.i(TAG, String.format("New Intent: %s", intent));
         Log.i(TAG, String.format("   Action: %s", intent.getAction()));
         Log.i(TAG, String.format("   Data: %s", intent.getData()));
@@ -254,10 +256,8 @@ public class MainTab extends Fragment {
 
         setWriteScheduled(false);
 
-        if (result != null) {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).addCard(result);
-            }
+        if ((result != null) && (getActivity() instanceof MainActivity)) {
+            ((MainActivity) getActivity()).addCard(result);
         }
     }
 

@@ -1,11 +1,11 @@
-package de.dentrassi.vat.nfc.programmer.list;
+package de.dentrassi.vat.nfc.programmer.data;
 
 import androidx.annotation.NonNull;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 
 public class CreatedCard {
     private final @NonNull String uid;

@@ -29,20 +29,21 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import de.dentrassi.vat.nfc.programmer.config.ConfigTab;
+import de.dentrassi.vat.nfc.programmer.config.ConfigFragment;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
-import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
-import de.dentrassi.vat.nfc.programmer.list.CreatedCardsContent;
-import de.dentrassi.vat.nfc.programmer.list.ListFragment;
+import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CreatedCardsContent;
+import de.dentrassi.vat.nfc.programmer.data.ListFragment;
+import de.dentrassi.vat.nfc.programmer.home.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private NfcAdapter adapter;
 
-    private MainTab mainTab;
+    private HomeFragment mainTab;
     private ListFragment listTab;
-    private ConfigTab configTab;
+    private ConfigFragment configTab;
 
     private CreatedCardsContent cards;
     private Configuration configuration;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (position) {
                     default:
                     case 0: {
-                        final MainTab result = new MainTab();
+                        final HomeFragment result = new HomeFragment();
                         MainActivity.this.mainTab = result;
                         return result;
                     }
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                         return result;
                     }
                     case 2: {
-                        final ConfigTab result = new ConfigTab();
+                        final ConfigFragment result = new ConfigFragment();
                         MainActivity.this.configTab = result;
                         return result;
                     }
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void addCard(@NonNull final CreatedCard card) {
+    public void addCard(@NonNull final CreatedCard card) {
         this.cards.add(card);
 
         try {
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         notifyCardsChange();
     }
 
-    public CreatedCardsContent getCards() {
+    public @NonNull CreatedCardsContent getCards() {
         return this.cards;
     }
 

@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 
 public class PlainTest {
 

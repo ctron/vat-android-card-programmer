@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.codec.Plain;
-import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Block;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;

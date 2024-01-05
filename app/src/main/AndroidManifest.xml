@@ -29,7 +29,7 @@
 
         <provider
             android:authorities="de.dentrassi.vat.nfc.programmer.csvProvider"
-            android:name="de.dentrassi.vat.nfc.programmer.list.CsvFileProvider"
+            android:name="de.dentrassi.vat.nfc.programmer.data.CsvFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

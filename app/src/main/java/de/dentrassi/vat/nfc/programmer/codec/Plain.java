@@ -7,7 +7,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
-import de.dentrassi.vat.nfc.programmer.data.CardId;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 
 public final class Plain {
     private Plain() {

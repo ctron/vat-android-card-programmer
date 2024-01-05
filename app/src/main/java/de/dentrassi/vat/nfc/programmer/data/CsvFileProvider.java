@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer.list;
+package de.dentrassi.vat.nfc.programmer.data;
 
 import androidx.core.content.FileProvider;
 

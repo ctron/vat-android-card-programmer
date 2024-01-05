@@ -1,14 +1,19 @@
-package de.dentrassi.vat.nfc.programmer.list;
+package de.dentrassi.vat.nfc.programmer.data;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,8 +34,10 @@ public class ListFragment extends Fragment {
     private static final String TAG = "ListFragment";
 
     private final int columnCount = 1;
+    private RecyclerView recyclerView;
 
     public ListFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -40,13 +47,14 @@ public class ListFragment extends Fragment {
             final Bundle savedInstanceState
     ) {
         final View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        this.recyclerView = view.findViewById(R.id.cardList);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.shareCards);
-        fab.setOnClickListener(x -> {
-            shareData();
-        });
+        // action button
 
-        final RecyclerView recyclerView = view.findViewById(R.id.cardList);
+        final FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.shareCards);
+        fab.setOnClickListener(x -> shareData());
+
+        // list view
 
         final Context context = view.getContext();
         if (this.columnCount <= 1) {
@@ -66,19 +74,51 @@ public class ListFragment extends Fragment {
 
         recyclerView.setAdapter(new CreatedCardRecyclerViewAdapter(cards));
 
+        // done
+
         return view;
     }
 
-    public void refreshItems() {
-        final View view = getView();
-        if (view == null) {
-            return;
-        }
-
-        final RecyclerView recyclerView = view.findViewById(R.id.cardList);
-        recyclerView.getAdapter().notifyDataSetChanged();
+    @Override
+    public void onCreateOptionsMenu(final @NonNull Menu menu, final @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.data, menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_clear_cards) {
+            clearData();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void clearData() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Clearing data")
+                .setMessage("This will clear all recorded cards.")
+                .setPositiveButton("Ok", (dialog, which) -> {
+                    performClearData();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                })
+                .create()
+                .show();
+    }
+
+    private void performClearData() {
+        ((MainActivity) getActivity()).getCards().clear();
+        refreshItems();
+    }
+
+    public void refreshItems() {
+        this.recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    /**
+     * Start a share intent to allow exporting the data
+     */
     void shareData() {
 
         final Context context = getContext();

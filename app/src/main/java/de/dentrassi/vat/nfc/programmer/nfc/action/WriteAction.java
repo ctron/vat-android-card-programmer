@@ -11,8 +11,8 @@ import com.google.common.io.BaseEncoding;
 import java.time.ZonedDateTime;
 import java.util.function.BiConsumer;
 
-import de.dentrassi.vat.nfc.programmer.data.CardId;
-import de.dentrassi.vat.nfc.programmer.list.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.Writer;
 

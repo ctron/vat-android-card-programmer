@@ -1,4 +1,4 @@
-package de.dentrassi.vat.nfc.programmer.list;
+package de.dentrassi.vat.nfc.programmer.data;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +37,9 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
         holder.uidView.setText(item.getUid());
         holder.memberIdView.setText(String.format(Locale.getDefault(), "%06d", item.getId().getMemberId()));
         holder.cardNumberView.setText(String.format(Locale.getDefault(), "%04d", item.getId().getCardNumber()));
-        holder.timestampView.setText(item.getTimestamp().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        holder.timestampView.setText(item.getTimestamp()
+                .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
     }
 
     @Override
