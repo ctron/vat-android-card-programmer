@@ -66,6 +66,14 @@ public class CreatedCardsContent {
         this.entries.add(entry);
     }
 
+
+    /**
+     * Remove card by tag UID.
+     */
+    public void remove(@NonNull final String uid) {
+        this.entries.removeIf(card -> card.getUid().equals(uid));
+    }
+
     /**
      * Loads the recorded cards.
      *

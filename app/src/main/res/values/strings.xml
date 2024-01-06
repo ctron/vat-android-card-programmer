@@ -11,5 +11,10 @@
     <string name="title_read_tag">Read Tag</string>
     <string name="title_clearing_data">Clearing data</string>
     <string name="message_clearing_data">This will clear all recorded cards.</string>
+    <string name="button_start_erase">Erase Tag</string>
+    <string name="message_keys_not_configured">Keys not configured</string>
+
+    <string name="message_tag_written">Tag written</string>
+    <string name="message_tag_ereased">Tag erased</string>
 
 </resources>

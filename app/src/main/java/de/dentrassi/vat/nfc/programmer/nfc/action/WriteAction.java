@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
-import de.dentrassi.vat.nfc.programmer.nfc.Writer;
+import de.dentrassi.vat.nfc.programmer.nfc.ops.Writer;
 
 public class WriteAction extends TagAction<CreatedCard> {
 

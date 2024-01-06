@@ -1,22 +1,28 @@
 package de.dentrassi.vat.nfc.programmer.nfc;
 
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 public class Keys {
-    private final Key a;
-    private final Key b;
+    private final @NonNull Key a;
+    private final @NonNull Key b;
 
-    public Keys(Key a, Key b) {
-        this.a = a;
-        this.b = b;
+    public Keys(@NonNull final Key a, @NonNull final Key b) {
+        this.a = Objects.requireNonNull(a);
+        this.b = Objects.requireNonNull(b);
     }
 
-    public Key getA() {
+    public @NonNull Key getA() {
         return this.a;
     }
 
-    public Key getB() {
+    public @NonNull Key getB() {
         return this.b;
+    }
+
+    public static @NonNull Keys defaultKeys() {
+        return new Keys(Key.emptyKey(), Key.defaultKey());
     }
 
     @Override

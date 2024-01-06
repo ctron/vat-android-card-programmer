@@ -17,8 +17,12 @@ public class SectorTrailer {
         this.b = Objects.requireNonNull(b);
     }
 
-    public static SectorTrailer of(final Keys keys, final AccessBits accessBits) {
+    public static @NonNull SectorTrailer of(final Keys keys, final AccessBits accessBits) {
         return new SectorTrailer(keys.getA(), accessBits.copy(), keys.getB());
+    }
+
+    public static @NonNull SectorTrailer defaultTrailer() {
+        return new SectorTrailer(Key.defaultKey(), new AccessBits(), Key.defaultKey());
     }
 
     public @NonNull byte[] encode() {

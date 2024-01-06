@@ -36,7 +36,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:ems="10"
                     android:hint="@string/text_member"
                     android:inputType="number"
                     android:maxLength="6"
@@ -57,7 +56,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:ems="10"
                     android:hint="@string/text_user"
                     android:inputType="number"
                     android:maxLength="4"
@@ -74,27 +72,37 @@
 
             <Button
                 android:id="@+id/startWriteButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/button_start_write" />
+
+            <Button
+                android:id="@+id/startEraseButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/button_start_erase" />
+
+            <Button
+                android:id="@+id/cancel_operation_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:text="@string/button_cancel_write" />
 
             <ProgressBar
                 android:id="@+id/writeProgress"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
         </LinearLayout>
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
 
         <TextView
             android:id="@+id/writeOutcome"
@@ -102,6 +110,13 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:text="" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="@dimen/text_margin" />
 
         <TextView
             android:layout_width="match_parent"

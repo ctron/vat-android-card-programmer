@@ -5,6 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 
 public class AccessBits {
 
@@ -19,7 +22,6 @@ public class AccessBits {
         /**
          * Default constructor, all bits false.
          */
-        @SuppressWarnings("unused")
         public BlockBits() {
         }
 
@@ -47,22 +49,44 @@ public class AccessBits {
                     .add("c3", c3)
                     .toString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            BlockBits blockBits = (BlockBits) o;
+            return c1 == blockBits.c1 && c2 == blockBits.c2 && c3 == blockBits.c3;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(c1, c2, c3);
+        }
     }
 
     /**
      * Bits for the whole sector
      */
     public static class Bits {
-        public BlockBits block0;
-        public BlockBits block1;
-        public BlockBits block2;
-        public BlockBits block3;
+        public final BlockBits block0;
+        public final BlockBits block1;
+        public final BlockBits block2;
+        public final BlockBits block3;
 
-        @SuppressWarnings("unused")
         public Bits() {
+            this.block0 = new BlockBits();
+            this.block1 = new BlockBits();
+            this.block2 = new BlockBits();
+            // the sector trailer has a default of C1=0, C2=0, C3=1
+            this.block3 = new BlockBits(false, false, true);
         }
 
-        public Bits(BlockBits block0, BlockBits block1, BlockBits block2, BlockBits block3) {
+        public Bits(
+                final BlockBits block0,
+                final BlockBits block1,
+                final BlockBits block2,
+                final BlockBits block3
+        ) {
             this.block0 = block0;
             this.block1 = block1;
             this.block2 = block2;
@@ -79,19 +103,34 @@ public class AccessBits {
                     .add("block3", block3)
                     .toString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Bits bits = (Bits) o;
+            return Objects.equals(block0, bits.block0) && Objects.equals(block1, bits.block1) && Objects.equals(block2, bits.block2) && Objects.equals(block3, bits.block3);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(block0, block1, block2, block3);
+        }
     }
 
     private final byte[] bits;
 
     public AccessBits() {
         this.bits = new byte[4];
+        // need to initialize the inverted bits
+        setBits(new Bits());
+        setUserData((byte) 105);
     }
 
     private AccessBits(@NonNull byte[] bits) {
         this.bits = bits;
     }
 
-    @SuppressWarnings("unused")
     public void setBits(@NonNull final Bits bits) {
         setBlockBits(Block.Block0, bits.block0);
         setBlockBits(Block.Block1, bits.block1);
@@ -99,7 +138,7 @@ public class AccessBits {
         setBlockBits(Block.Block3, bits.block3);
     }
 
-    public void setBlockBits(@NonNull Block block, @NonNull BlockBits bits) {
+    public void setBlockBits(@NonNull final Block block, @NonNull final BlockBits bits) {
         switch (block) {
             case Block0:
                 setBit(bits.c1, 1, 4, 0, 0);
@@ -189,6 +228,10 @@ public class AccessBits {
         return this.bits[3];
     }
 
+    public void setUserData(byte userData) {
+        this.bits[3] = userData;
+    }
+
     public static @NonNull AccessBits fromData(@NonNull byte[] bits) {
         if (bits.length != 4) {
             throw new IllegalArgumentException("Access bits must have a length of 4 bits");
@@ -214,5 +257,18 @@ public class AccessBits {
     @NonNull
     public AccessBits copy() {
         return new AccessBits(this.bits.clone());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AccessBits that = (AccessBits) o;
+        return Arrays.equals(bits, that.bits);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(bits);
     }
 }

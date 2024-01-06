@@ -1,20 +1,14 @@
 package de.dentrassi.vat.nfc.programmer.home;
 
 import android.content.Intent;
-import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,19 +17,16 @@ import androidx.fragment.app.Fragment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.databinding.HomeFragmentBinding;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
-import de.dentrassi.vat.nfc.programmer.nfc.Tools;
-import de.dentrassi.vat.nfc.programmer.nfc.action.Data;
-import de.dentrassi.vat.nfc.programmer.nfc.action.NdefReader;
+import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
 
@@ -43,14 +34,24 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = "MainTab";
 
-    private TextView textView;
-    private Button writeButton;
-    private ProgressBar writeProgress;
-    private boolean writeScheduled;
-    private TextView writeOutcome;
+    private HomeFragmentBinding binding;
 
-    private EditText memberIdInput;
-    private EditText cardNumberInput;
+    private enum Operation {
+        /**
+         * No pending operation
+         */
+        None,
+        /**
+         * Pending write operation.
+         */
+        Write,
+        /**
+         * Pending erase operation.
+         */
+        Erase,
+    }
+
+    private Operation scheduledOperation = Operation.None;
 
     public HomeFragment() {
     }
@@ -60,18 +61,15 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.home_fragment, container, false);
 
-        this.textView = view.findViewById(R.id.tagOutput);
-        this.writeButton = view.findViewById(R.id.startWriteButton);
-        this.writeProgress = view.findViewById(R.id.writeProgress);
-        this.writeOutcome = view.findViewById(R.id.writeOutcome);
+        this.binding = HomeFragmentBinding.bind(view);
 
-        this.memberIdInput = view.findViewById(R.id.memberIdInput);
-        this.cardNumberInput = view.findViewById(R.id.cardNumberInput);
 
-        this.memberIdInput.setSelectAllOnFocus(true);
-        this.cardNumberInput.setSelectAllOnFocus(true);
+        this.binding.memberIdInput.setSelectAllOnFocus(true);
+        this.binding.cardNumberInput.setSelectAllOnFocus(true);
 
-        this.writeButton.setOnClickListener(this::onScheduleWrite);
+        this.binding.startWriteButton.setOnClickListener(this::onScheduleWrite);
+        this.binding.startEraseButton.setOnClickListener(this::onScheduleErase);
+        this.binding.cancelOperationButton.setOnClickListener(this::onCancelOperation);
 
         return view;
     }
@@ -106,26 +104,7 @@ public class HomeFragment extends Fragment {
                     return;
                 }
 
-                if (this.writeScheduled) {
-                    try {
-                        final CardId id = CardId.of(
-                                Integer.parseInt(this.memberIdInput.getText().toString(), 10),
-                                Integer.parseInt(this.cardNumberInput.getText().toString(), 10),
-                                UUID.randomUUID()
-                        );
-                        final Keys keys = getConfiguration().getKeys().get("VAT");
-                        if (keys == null) {
-                            setTagText("No keys present for writing");
-                            return;
-                        }
-                        new WriteAction(tag, keys, id, this::writeComplete).run();
-                    } catch (final Exception e) {
-                        Log.w(TAG, "Failed to write tag", e);
-                        setTagText(String.format("Failed to write tag: %s", e.getMessage()));
-                    }
-                } else {
-                    tagScanned(intent, tag);
-                }
+                tagDiscovered(intent, tag);
 
                 break;
 
@@ -136,86 +115,90 @@ public class HomeFragment extends Fragment {
     }
 
     /**
+     * Called when a tag was discovered.
+     */
+    private void tagDiscovered(@NonNull final Intent intent, @NonNull final Tag tag) {
+
+
+        switch (this.scheduledOperation) {
+            case Write: {
+                try {
+                    final CardId id = CardId.of(
+                            Integer.parseInt(this.binding.memberIdInput.getText().toString(), 10),
+                            Integer.parseInt(this.binding.cardNumberInput.getText().toString(), 10),
+                            UUID.randomUUID()
+                    );
+                    final Keys keys = getConfiguration().getKeys().get("VAT");
+                    if (keys == null) {
+                        setTagText("No keys present for writing");
+                        return;
+                    }
+                    new WriteAction(tag, keys, id, this::writeComplete).run();
+                } catch (final Exception e) {
+                    Log.w(TAG, "Failed to write tag", e);
+                    setTagText(String.format("Failed to write tag: %s", e.getMessage()));
+                }
+                break;
+            }
+            case Erase: {
+                try {
+                    final Keys keys = getConfiguration().getKeys().get("VAT");
+                    if (keys == null) {
+                        setTagText("No keys present for writing");
+                        return;
+                    }
+                    new EraseAction(tag, keys, this::eraseComplete).run();
+                } catch (final Exception e) {
+                    Log.w(TAG, "Failed to erase tag", e);
+                    setTagText(String.format("Failed to erase tag: %s", e.getMessage()));
+                }
+                break;
+            }
+            case None: {
+                tagDiscoveredRead(intent, tag);
+                break;
+            }
+        }
+
+
+    }
+
+    /**
      * Set the current tag state.
      *
      * @param text the text to show
      */
     private void setTagText(final String text) {
-        this.textView.setText(text);
+        this.binding.tagOutput.setText(text);
     }
 
-    private void tagScanned(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
+    /**
+     * Called when a tag was discovered, and we are in read mode.
+     */
+    private void tagDiscoveredRead(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
         final Keys keys = getConfiguration().getKeys().get("VAT");
         if (keys == null) {
             setTagText("Missing configuration");
             return;
         }
 
-        new ReadAction(tag, keys, (m, ex) -> {
+        new ReadAction(tag, keys, (id, ex) -> {
             if (ex != null) {
                 setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
+                return;
             }
-            tagRead(tag, m);
+            tagRead(tag, id);
         }).run();
     }
 
-    /// Handle a scanned NDEF tag
-    private void tagNdefScanned(@NonNull final Intent intent, @NonNull final Tag tag) {
-
-        final Parcelable[] par = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-        if (par != null) {
-
-            final NdefMessage[] messages = Arrays.stream(par).flatMap(p -> {
-                if (p instanceof NdefMessage) {
-                    return Stream.of((NdefMessage) p);
-                } else {
-                    return Stream.empty();
-                }
-            }).toArray(NdefMessage[]::new);
-            tagNdefRead(tag, messages);
-
-        } else {
-
-            new NdefReader(tag, (m, ex) -> {
-                if (ex != null) {
-                    setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
-                }
-                if (m != null) {
-                    tagNdefRead(tag, new NdefMessage[]{m});
-                }
-            }).run();
-
-        }
-    }
-
-    private void tagNdefRead(final Tag tag, final NdefMessage[] messages) {
-
-        final StringBuilder sb = new StringBuilder("Tag discovered.");
-
-        Tools.dumpTagData(messages);
-
-        final Optional<Data> data = Data.fromNdefMessage(messages);
-        sb.append("\n\n");
-        if (!data.isPresent()) {
-            sb.append("No VAT data detected");
-        }
-        data.ifPresent(d -> sb.append(String.format("Tag data: %s", d.getCode())));
-
-        if (tag.getTechList() != null) {
-            if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
-                sb.append("\n\nTag can be used for access control.");
-            }
-        }
-
-        setTagText(sb.toString());
-    }
-
-    private void tagRead(final Tag tag, Optional<CardId> id) {
+    /**
+     * Called when a tag was read.
+     */
+    private void tagRead(final Tag tag, final CardId id) {
         final StringBuilder sb = new StringBuilder("Tag discovered.").append("\n\n");
 
-        if (id.isPresent()) {
-            sb.append(String.format("Card Information: %s / %s", id.get().getMemberId(), id.get().getCardNumber()));
+        if (id != null) {
+            sb.append(String.format("Card Information: %s / %s", id.getMemberId(), id.getCardNumber()));
         } else {
             sb.append("No ID data detected");
         }
@@ -232,34 +215,55 @@ public class HomeFragment extends Fragment {
     /**
      * Set the write-scheduled state
      *
-     * @param state the new state
+     * @param operation the new state
      */
-    private void setWriteScheduled(boolean state) {
-        if (this.writeScheduled == state) {
+    private void scheduleOperation(@NonNull final Operation operation) {
+
+        if (this.scheduledOperation == operation) {
             return;
         }
 
-        this.writeScheduled = state;
-        if (this.writeScheduled) {
-            this.writeButton.setText(R.string.button_cancel_write);
-            this.writeProgress.setVisibility(View.VISIBLE);
+        this.scheduledOperation = operation;
+
+        if (this.scheduledOperation != Operation.None) {
+            this.binding.startWriteButton.setVisibility(View.GONE);
+            this.binding.startEraseButton.setVisibility(View.GONE);
+            this.binding.cancelOperationButton.setVisibility(View.VISIBLE);
+            this.binding.writeProgress.setVisibility(View.VISIBLE);
         } else {
-            this.writeButton.setText(R.string.button_start_write);
-            this.writeProgress.setVisibility(View.GONE);
+            this.binding.startWriteButton.setVisibility(View.VISIBLE);
+            this.binding.startEraseButton.setVisibility(View.VISIBLE);
+            this.binding.cancelOperationButton.setVisibility(View.GONE);
+            this.binding.writeProgress.setVisibility(View.GONE);
         }
+
     }
 
     private void writeComplete(final @Nullable CreatedCard result, @Nullable final Exception ex) {
         if (ex != null) {
-            this.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
+            this.binding.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
         } else {
-            this.writeOutcome.setText("Tag written");
+            this.binding.writeOutcome.setText(R.string.message_tag_written);
         }
 
-        setWriteScheduled(false);
+        scheduleOperation(Operation.None);
 
         if ((result != null) && (getActivity() instanceof MainActivity)) {
             ((MainActivity) getActivity()).addCard(result);
+        }
+    }
+
+    private void eraseComplete(final @Nullable String result, @Nullable final Exception ex) {
+        if (ex != null) {
+            this.binding.writeOutcome.setText(String.format("Failed to erase: %s", ex.getMessage()));
+        } else {
+            this.binding.writeOutcome.setText(R.string.message_tag_ereased);
+        }
+
+        scheduleOperation(Operation.None);
+
+        if ((result != null) && (getActivity() instanceof MainActivity)) {
+            ((MainActivity) getActivity()).removeCard(result);
         }
     }
 
@@ -271,23 +275,40 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    protected void onCancelOperation(final View view) {
+        writeComplete(null, new RuntimeException("Operation cancelled"));
+    }
+
     protected void onScheduleWrite(final View view) {
-        if (!this.writeScheduled) {
+        if (this.scheduledOperation == Operation.None) {
             scheduleWrite();
-        } else {
-            writeComplete(null, new RuntimeException("Write cancelled"));
+        }
+    }
+
+    protected void onScheduleErase(final View view) {
+        if (this.scheduledOperation == Operation.None) {
+            scheduleErase();
         }
     }
 
     protected void scheduleWrite() {
-
         if (getConfiguration().getKeys().get("VAT") == null) {
-            this.writeOutcome.setText("Keys not configured");
+            this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
             return;
         }
 
-        this.writeOutcome.setText("");
-        setWriteScheduled(true);
+        this.binding.writeOutcome.setText("");
+        scheduleOperation(Operation.Write);
+    }
+
+    protected void scheduleErase() {
+        if (getConfiguration().getKeys().get("VAT") == null) {
+            this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
+            return;
+        }
+
+        this.binding.writeOutcome.setText("");
+        scheduleOperation(Operation.Erase);
     }
 
 }

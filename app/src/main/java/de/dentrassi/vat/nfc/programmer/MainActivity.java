@@ -182,7 +182,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void addCard(@NonNull final CreatedCard card) {
         this.cards.add(card);
+        cardsModified();
+    }
 
+    public void removeCard(@NonNull final String tagUid) {
+        this.cards.remove(tagUid);
+        cardsModified();
+    }
+
+    private void cardsModified() {
         try {
             this.cards.store();
         } catch (final Exception e) {
