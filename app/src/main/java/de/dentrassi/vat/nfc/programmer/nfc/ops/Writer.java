@@ -61,8 +61,8 @@ public class Writer extends BaseWriter {
         final byte[] data = SectorTrailer.of(this.keys, accessBits).encode();
 
         try {
-            // try unprovisioned card first, using the default key
-            writeWithKey(Key.defaultKey(), WithKey.B, Block.Block3, data);
+            // try unprovisioned card first, using the default key as Key A
+            writeWithKey(Key.defaultKey(), WithKey.A, Block.Block3, data);
         } catch (final AuthenticationFailedException e2) {
             // if that fails with an authentication error, try key B
             Log.i(TAG, "Try writing with key B");
