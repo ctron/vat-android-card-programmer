@@ -7,6 +7,17 @@
     <string name="unset">Leer</string>
     <string name="text_user">Benutzer</string>
     <string name="text_member">Mitglied</string>
-    <string name="label_write_tag">Schreibe Chip</string>
+    <string name="title_write_tag">Chip schreiben</string>
     <string name="title_read_tag">Gelesener Chip</string>
+    <string name="title_clearing_data">Daten löschen</string>
+    <string name="message_clearing_data">Dies wird alle aufgezeichneten Daten löschen.</string>
+    <string name="button_start_erase">Chip löschen</string>
+    <string name="message_keys_not_configured">Keine Schlüssel konfiguriert</string>
+    <string name="message_tag_written">Chip geschrieben</string>
+    <string name="message_tag_ereased">Chip gelöscht</string>
+    <string name="message_missing_configuration">Fehlende Konfiguration. Provisionierung nicht möglich. Bitte Konfiguration importieren.</string>
+    <string name="tab_home">Chip</string>
+    <string name="tab_data">Daten</string>
+    <string name="tab_config">Konfiguration</string>
+    <string name="message_import_cancelled">Import abgebrochen</string>
 </resources>

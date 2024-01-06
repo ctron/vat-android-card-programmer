@@ -1,8 +1,11 @@
 {
-  "keys": {
+  "$schema": "config.schema.yaml",
+  "organizations": {
     "VAT": {
-      "a": "FFEEDDCCBBAA",
-      "b": "AABBCCDDEEFF"
+      "keys": {
+        "a": "FFEEDDCCBBAA",
+        "b": "AABBCCDDEEFF"
+      }
     }
   }
 }

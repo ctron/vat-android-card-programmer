@@ -16,5 +16,11 @@
 
     <string name="message_tag_written">Tag written</string>
     <string name="message_tag_ereased">Tag erased</string>
+    <string name="message_missing_configuration">Missing configuration. Unable to provision new tags.</string>
+    <string name="tab_home">Tag</string>
+    <string name="tab_data">Data</string>
+    <string name="tab_config">Config</string>
+    <string name="message_import_cancelled">Import cancelled</string>
+    <string name="message_configuration_imported">Configuration imported</string>
 
 </resources>

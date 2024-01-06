@@ -58,7 +58,7 @@ public class ConfigFragment extends Fragment {
 
     private void setConfig(@NonNull final Configuration configuration) {
 
-        final Keys keys = configuration.getKeys().get("VAT");
+        final Keys keys = configuration.getKeysFor("VAT");
         if (keys == null) {
             this.vatKeyA.setText(R.string.unset);
             this.vatKeyB.setText(R.string.unset);

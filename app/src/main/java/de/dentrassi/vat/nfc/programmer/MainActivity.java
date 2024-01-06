@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import de.dentrassi.vat.nfc.programmer.config.ConfigFragment;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
+import de.dentrassi.vat.nfc.programmer.config.ConfigurationStore;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCardsContent;
 import de.dentrassi.vat.nfc.programmer.data.ListFragment;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ConfigFragment configTab;
 
     private CreatedCardsContent cards;
-    private Configuration configuration;
+    private Configuration configuration = new Configuration();
 
     private final ActivityResultLauncher<String> importConfig = registerForActivityResult(new ActivityResultContracts.GetContent(), this::performImportConfig);
 
@@ -60,7 +61,11 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, "Failed to load cards", e);
         }
 
-        this.configuration = Configuration.load(getConfigPath());
+        try {
+            this.configuration = ConfigurationStore.load(getConfigPath());
+        } catch (final Exception e) {
+            Log.w(TAG, "Failed to load configuration", e);
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -103,13 +108,13 @@ public class MainActivity extends AppCompatActivity {
                 (tab, position) -> {
                     switch (position) {
                         case 0:
-                            tab.setText("Tag");
+                            tab.setText(R.string.tab_home);
                             break;
                         case 1:
-                            tab.setText("Data");
+                            tab.setText(R.string.tab_data);
                             break;
                         case 2:
-                            tab.setText("Config");
+                            tab.setText(R.string.tab_config);
                             break;
                     }
                 }
@@ -213,11 +218,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void performImportConfig(final Uri uri) {
+        if (uri == null) {
+            Toast.makeText(this, R.string.message_import_cancelled, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         try (final InputStream in = getContentResolver().openInputStream(uri)) {
-            this.configuration = Configuration.load(in);
+            this.configuration = ConfigurationStore.load(in);
             this.configuration.store(getConfigPath());
-            Toast.makeText(this, "Configuration imported", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.message_configuration_imported, Toast.LENGTH_SHORT).show();
             this.configTab.configChanged();
+            this.mainTab.configChanged();
         } catch (final Exception e) {
             Log.w(TAG, "Failed to import configuration", e);
             Toast.makeText(this, String.format("Import failed: " + e), Toast.LENGTH_LONG).show();

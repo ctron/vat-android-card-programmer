@@ -1,0 +1,38 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+
+additionalProperties: false
+properties:
+
+  "$schema": true
+
+  organizations:
+    type: object
+    additionalProperties:
+      $ref: "#/definitions/Organization"
+
+definitions:
+
+  Organization:
+    type: object
+    additionalProperties: false
+    required:
+      - keys
+    properties:
+      keys:
+        $ref: "#/definitions/Keys"
+
+  Keys:
+    type: object
+    additionalProperties: false
+    required:
+      - a
+      - b
+    properties:
+      a:
+        $ref: "#/definitions/Key"
+      b:
+        $ref: "#/definitions/Key"
+
+  Key:
+    type: string

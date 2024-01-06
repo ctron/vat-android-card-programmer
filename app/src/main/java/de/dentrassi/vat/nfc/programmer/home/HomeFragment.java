@@ -71,7 +71,21 @@ public class HomeFragment extends Fragment {
         this.binding.startEraseButton.setOnClickListener(this::onScheduleErase);
         this.binding.cancelOperationButton.setOnClickListener(this::onCancelOperation);
 
+        configChanged();
+
         return view;
+    }
+
+    public void configChanged() {
+        if (getConfiguration().getOrganizations().isEmpty()) {
+            this.binding.writeOutcome.setText(R.string.message_missing_configuration);
+            this.binding.startWriteButton.setEnabled(false);
+            this.binding.startEraseButton.setEnabled(false);
+        } else {
+            this.binding.writeOutcome.setText("");
+            this.binding.startWriteButton.setEnabled(true);
+            this.binding.startEraseButton.setEnabled(true);
+        }
     }
 
     public void onNewIntent(final Intent intent) {
@@ -128,7 +142,7 @@ public class HomeFragment extends Fragment {
                             Integer.parseInt(this.binding.cardNumberInput.getText().toString(), 10),
                             UUID.randomUUID()
                     );
-                    final Keys keys = getConfiguration().getKeys().get("VAT");
+                    final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
                         setTagText("No keys present for writing");
                         return;
@@ -142,7 +156,7 @@ public class HomeFragment extends Fragment {
             }
             case Erase: {
                 try {
-                    final Keys keys = getConfiguration().getKeys().get("VAT");
+                    final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
                         setTagText("No keys present for writing");
                         return;
@@ -160,7 +174,6 @@ public class HomeFragment extends Fragment {
             }
         }
 
-
     }
 
     /**
@@ -176,7 +189,7 @@ public class HomeFragment extends Fragment {
      * Called when a tag was discovered, and we are in read mode.
      */
     private void tagDiscoveredRead(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
-        final Keys keys = getConfiguration().getKeys().get("VAT");
+        final Keys keys = getConfiguration().getKeysFor("VAT");
         if (keys == null) {
             setTagText("Missing configuration");
             return;
@@ -292,7 +305,7 @@ public class HomeFragment extends Fragment {
     }
 
     protected void scheduleWrite() {
-        if (getConfiguration().getKeys().get("VAT") == null) {
+        if (getConfiguration().getKeysFor("VAT") == null) {
             this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
             return;
         }
@@ -302,7 +315,7 @@ public class HomeFragment extends Fragment {
     }
 
     protected void scheduleErase() {
-        if (getConfiguration().getKeys().get("VAT") == null) {
+        if (getConfiguration().getKeysFor("VAT") == null) {
             this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
             return;
         }
