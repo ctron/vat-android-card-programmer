@@ -15,6 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name="de.dentrassi.vat.nfc.programmer.Application"
         android:theme="@style/Theme.VATNFCProgrammer"
         tools:targetApi="31">
         <activity

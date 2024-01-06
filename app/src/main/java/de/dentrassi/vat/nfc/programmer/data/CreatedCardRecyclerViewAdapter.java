@@ -34,12 +34,12 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final CreatedCard item = this.entries.get(position);
 
-        holder.uidView.setText(item.getUid());
+        holder.chipUidView.setText(item.getUid());
         holder.memberIdView.setText(String.format(Locale.getDefault(), "%06d", item.getId().getMemberId()));
         holder.cardNumberView.setText(String.format(Locale.getDefault(), "%04d", item.getId().getCardNumber()));
-
         holder.timestampView.setText(item.getTimestamp()
                 .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
+        holder.cardUidView.setText(item.getId().getUid().toString());
     }
 
     @Override
@@ -48,18 +48,20 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView uidView;
+        public final TextView chipUidView;
         public final TextView memberIdView;
         public final TextView cardNumberView;
         public final TextView timestampView;
+        public final TextView cardUidView;
 
-        public ViewHolder(FragmentItemBinding binding) {
+        public ViewHolder(final FragmentItemBinding binding) {
             super(binding.getRoot());
 
-            this.uidView = binding.cardUid;
+            this.chipUidView = binding.chipUid;
             this.memberIdView = binding.memberId;
             this.cardNumberView = binding.cardNumber;
             this.timestampView = binding.timestamp;
+            this.cardUidView = binding.cardUid;
         }
     }
 }

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import de.dentrassi.vat.nfc.programmer.MainActivity;
@@ -109,7 +110,8 @@ public class HomeFragment extends Fragment {
                     try {
                         final CardId id = CardId.of(
                                 Integer.parseInt(this.memberIdInput.getText().toString(), 10),
-                                Integer.parseInt(this.cardNumberInput.getText().toString(), 10)
+                                Integer.parseInt(this.cardNumberInput.getText().toString(), 10),
+                                UUID.randomUUID()
                         );
                         final Keys keys = getConfiguration().getKeys().get("VAT");
                         if (keys == null) {

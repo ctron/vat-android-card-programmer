@@ -2,6 +2,7 @@ package de.dentrassi.vat.nfc.programmer.nfc.action;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -33,18 +34,20 @@ public class ReadAction extends TagAction<Optional<CardId>> {
 
             if (!m.authenticateSectorWithKeyB(1, this.keys.getB().getKey())) {
                 // FIXME: check for either case an provide a better message
-                throw new Exception("Not authorized. Unprovisioned card of wrong key.");
+                throw new Exception("Not authorized. Unprovisioned card or wrong key.");
             }
 
             final int blockIndex = Tools.blockIndexFrom(m, 1, Block.Block0);
 
             try {
-                final byte[] data = m.readBlock(blockIndex);
-                return Optional.of(Plain.decode(data));
-            } catch (Exception e) {
+                final byte[] data0 = m.readBlock(blockIndex);
+                final byte[] data1 = m.readBlock(blockIndex + 1);
+                return Optional.of(Plain.decode(data0, data1));
+            } catch (final Exception e) {
+                // FIXME: should report error
+                Log.w("Failed to decode", e);
                 return Optional.empty();
             }
-
 
         } finally {
             m.close();

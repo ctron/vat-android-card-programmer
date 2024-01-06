@@ -15,13 +15,13 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/title_write_tag"
             android:layout_margin="@dimen/text_margin"
-            android:theme="@style/TextAppearance.Material3.HeadlineMedium" />
+            android:text="@string/title_write_tag"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TableLayout
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <TableRow>
 
@@ -29,8 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/text_member"
-                    android:textAppearance="@android:style/TextAppearance.Material.Widget" />
+                    android:text="@string/text_member" />
 
                 <EditText
                     android:id="@+id/memberIdInput"
@@ -40,8 +39,8 @@
                     android:ems="10"
                     android:hint="@string/text_member"
                     android:inputType="number"
-                    android:singleLine="true"
                     android:maxLength="6"
+                    android:singleLine="true"
                     android:text="000000" />
             </TableRow>
 
@@ -51,8 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/text_user"
-                    android:textAppearance="@android:style/TextAppearance.Material.Widget" />
+                    android:text="@string/text_user" />
 
                 <EditText
                     android:id="@+id/cardNumberInput"
@@ -62,8 +60,8 @@
                     android:ems="10"
                     android:hint="@string/text_user"
                     android:inputType="number"
-                    android:singleLine="true"
                     android:maxLength="4"
+                    android:singleLine="true"
                     android:text="0001" />
             </TableRow>
 
@@ -84,10 +82,11 @@
             <ProgressBar
                 android:id="@+id/writeProgress"
                 style="?android:attr/progressBarStyle"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
         </LinearLayout>
 
@@ -101,15 +100,15 @@
             android:id="@+id/writeOutcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:fontFamily="monospace" />
+            android:fontFamily="monospace"
+            android:text="" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/title_read_tag"
             android:layout_margin="@dimen/text_margin"
-            android:theme="@style/TextAppearance.Material3.HeadlineMedium" />
+            android:text="@string/title_read_tag"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:id="@+id/tagOutput"

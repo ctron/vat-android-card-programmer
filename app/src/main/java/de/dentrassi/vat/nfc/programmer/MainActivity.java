@@ -24,7 +24,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             this.cards.store();
-        } catch (IOException e) {
+        } catch (final Exception e) {
             Log.w(TAG, "Failed to store cards", e);
         }
 
