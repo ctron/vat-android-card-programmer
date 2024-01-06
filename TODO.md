@@ -2,6 +2,6 @@
 
 * [x] Make keys configurable
 * [x] Allow writing a new card
-* [ ] Export CSV
-* [ ] Clear CSV
+* [x] Export CSV
+* [x] Clear CSV
 * [ ] Write MAD
