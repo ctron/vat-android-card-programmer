@@ -19,7 +19,7 @@ public class ConfigurationTest {
         final Keys keys = config.getKeysFor("VAT");
         Assert.assertNotNull(keys);
 
-        Assert.assertEquals(Key.defaultKey(), keys.getA());
+        Assert.assertEquals(Key.fromString("FFEEDDCCBBAA"), keys.getA());
         Assert.assertEquals(Key.fromString("AABBCCDDEEFF"), keys.getB());
     }
 
