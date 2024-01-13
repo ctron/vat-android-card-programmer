@@ -152,6 +152,7 @@ public class HomeFragment extends Fragment {
             case NfcAdapter.ACTION_TAG_DISCOVERED:
                 final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 if (tag == null) {
+                    Log.w(TAG, "Tag discovered, but provides no instance");
                     return;
                 }
 
@@ -169,6 +170,7 @@ public class HomeFragment extends Fragment {
      * Called when a tag was discovered.
      */
     private void tagDiscovered(@NonNull final Intent intent, @NonNull final Tag tag) {
+        Log.d(TAG, String.format("Tag discovered - operation: %s", this.scheduledOperation));
 
         switch (this.scheduledOperation) {
             case Write: {
@@ -271,6 +273,8 @@ public class HomeFragment extends Fragment {
      */
     private void scheduleOperation(@NonNull final Operation operation) {
 
+        Log.d(TAG, "schedule operation: " + operation);
+
         if (this.scheduledOperation == operation) {
             return;
         }
@@ -292,6 +296,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void writeComplete(final @Nullable CreatedCard result, @Nullable final Exception ex) {
+        Log.d(TAG, String.format("writeComplete - result: %s, ex: %s", result, ex));
+
         if (ex != null) {
             this.binding.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
         } else {
@@ -305,7 +311,9 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void eraseComplete(final @Nullable byte[] result, @Nullable final Exception ex) {
+    private void eraseComplete(@Nullable byte[] result, @Nullable final Exception ex) {
+        Log.d(TAG, String.format("erase - result: %s, ex: %s", result == null ? "<null>" : BaseEncoding.base16().encode(result), ex));
+
         if (ex != null) {
             this.binding.writeOutcome.setText(String.format(getString(R.string.message_failed_to_erase), ex.getMessage()));
         } else {
@@ -328,22 +336,28 @@ public class HomeFragment extends Fragment {
     }
 
     protected void onCancelOperation(final View view) {
+        Log.d(TAG, "request to cancel operation");
         writeComplete(null, new RuntimeException(getString(R.string.message_operation_cancelled)));
     }
 
     protected void onScheduleWrite(final View view) {
+        Log.d(TAG, "requested write operation");
         if (this.scheduledOperation == Operation.None) {
             scheduleWrite();
         }
     }
 
     protected void onScheduleErase(final View view) {
+        Log.d(TAG, "requested erase operation");
+
         if (this.scheduledOperation == Operation.None) {
             scheduleErase();
         }
     }
 
     protected void scheduleWrite() {
+        Log.d(TAG, "schedule write operation");
+
         if (getConfiguration().getKeysFor("VAT") == null) {
             this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
             return;
@@ -354,6 +368,8 @@ public class HomeFragment extends Fragment {
     }
 
     protected void scheduleErase() {
+        Log.d(TAG, "schedule erase operation");
+
         if (getConfiguration().getKeysFor("VAT") == null) {
             this.binding.writeOutcome.setText(R.string.message_keys_not_configured);
             return;
