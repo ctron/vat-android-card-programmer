@@ -10,8 +10,8 @@ android {
         applicationId = "de.dentrassi.vat.nfc.programmer"
         minSdk = 29
         targetSdk = 34
-        versionCode = 4
-        versionName = "0.0.4"
+        versionCode = 5
+        versionName = "0.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
