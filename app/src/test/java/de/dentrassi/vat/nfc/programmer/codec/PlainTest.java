@@ -3,7 +3,6 @@ package de.dentrassi.vat.nfc.programmer.codec;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import de.dentrassi.vat.nfc.programmer.model.CardId;
@@ -13,68 +12,49 @@ public class PlainTest {
     @Test
     public void testOk() throws Exception {
         final CardId id = Plain.decode(
-                "0123450123".getBytes(StandardCharsets.US_ASCII),
-                new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+                new byte[]{0, 0, 0, 123, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0}
         );
 
-        Assert.assertEquals(12345, id.getMemberId());
-        Assert.assertEquals(123, id.getCardNumber());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNull() throws Exception {
-        final CardId id = Plain.decode(new byte[16], new byte[16]);
-
-        Assert.assertEquals(12345, id.getMemberId());
-        Assert.assertEquals(123, id.getCardNumber());
+        Assert.assertEquals(123, id.getMemberId());
+        Assert.assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7}, id.getUid());
     }
 
     @Test
-    public void encode() {
+    public void testNull() throws Exception {
+        final CardId id = Plain.decode(new byte[16]);
+
+        Assert.assertEquals(0, id.getMemberId());
+        Assert.assertArrayEquals(new byte[]{0, 0, 0, 0, 0, 0, 0}, id.getUid());
+    }
+
+    @Test
+    public void encodeDecode() throws Exception {
         final UUID uid = UUID.fromString("a9ec45d7-b56c-47a4-943e-3af3a27eedaf");
-        final byte[][] data = Plain.encode(CardId.of(123, 12, uid));
+        final byte[] data = Plain.encode(CardId.of(999999, new byte[]{1, 2, 3, 4, 5, 6, 7}));
 
-        Assert.assertEquals(2, data.length);
-        Assert.assertEquals(16, data[0].length);
-        Assert.assertEquals(16, data[1].length);
+        Assert.assertEquals(16, data.length);
 
-        Assert.assertArrayEquals(data[0], new byte[]{
-                (byte) '0',
-                (byte) '0',
-                (byte) '0',
-                (byte) '1',
-                (byte) '2',
-                (byte) '3',
-                (byte) '0',
-                (byte) '0',
-                (byte) '1',
-                (byte) '2',
+        Assert.assertArrayEquals(new byte[]{
+                (byte) 0x00,
+                (byte) 0x0F,
+                (byte) 0x42,
+                (byte) 0x3F,
+                (byte) 1,
+                (byte) 2,
+                (byte) 3,
+                (byte) 4,
+                (byte) 5,
+                (byte) 6,
+                (byte) 7,
                 (byte) 0,
                 (byte) 0,
                 (byte) 0,
                 (byte) 0,
                 (byte) 0,
-                (byte) 0,
-        });
+        }, data);
 
-        Assert.assertArrayEquals(data[1], new byte[]{
-                (byte) 0xA9,
-                (byte) 0xEC,
-                (byte) 0x45,
-                (byte) 0xD7,
-                (byte) 0xB5,
-                (byte) 0x6C,
-                (byte) 0x47,
-                (byte) 0xA4,
-                (byte) 0x94,
-                (byte) 0x3E,
-                (byte) 0x3A,
-                (byte) 0xF3,
-                (byte) 0xA2,
-                (byte) 0x7E,
-                (byte) 0xED,
-                (byte) 0xAF,
-        });
+        final CardId result = Plain.decode(data);
+        Assert.assertEquals(999999, result.getMemberId());
 
     }
 }

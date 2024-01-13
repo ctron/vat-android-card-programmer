@@ -3,7 +3,6 @@ package de.dentrassi.vat.nfc.programmer.model;
 import androidx.annotation.NonNull;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class CardId {
     /**
@@ -12,52 +11,46 @@ public class CardId {
     private final int memberId;
 
     /**
-     * Number of the card, only unique per-member (0 to 9.999 inclusive).
+     * The tag's UID (max 7 bytes)
      */
-    private final int cardNumber;
+    private final byte[] uid;
 
-    /**
-     * A random, unique card ID.
-     */
-    private final UUID uid;
-
-    private CardId(final int memberId, final int cardNumber, @NonNull final UUID uid) {
+    private CardId(final int memberId, @NonNull final byte[] uid) throws IllegalArgumentException {
         this.memberId = memberId;
-        this.cardNumber = cardNumber;
-        this.uid = uid;
+        this.uid = Objects.requireNonNull(uid);
+
     }
 
     public int getMemberId() {
         return this.memberId;
     }
 
-    public int getCardNumber() {
-        return this.cardNumber;
-    }
-
-    public UUID getUid() {
-        return this.uid;
+    /**
+     * Get the tag UID
+     *
+     * @return A copy of the tag UID
+     */
+    public byte[] getUid() {
+        return this.uid.clone();
     }
 
     /**
      * Create a new instance
      *
-     * @param memberId   the member id.
-     * @param cardNumber the card number (per-member).
-     * @param uid        A unique card id.
+     * @param memberId the member id.
+     * @param uid      the tag's UID (4-7 bytes).
      * @return a new instance
-     * @throws IllegalArgumentException if any of the IDs are out of range
+     * @throws IllegalArgumentException if any of the IDs are out of range, or if the tag UID is not between 4 and 7 bytes long.
      */
-    public static CardId of(final int memberId, final int cardNumber, @NonNull final UUID uid) {
+    public static CardId of(final int memberId, @NonNull final byte[] uid) {
         if (memberId < 0 || memberId > 999_999) {
             throw new IllegalArgumentException("Member ID must be between 0 and 999999");
         }
 
-        if (cardNumber < 0 | cardNumber > 9_999) {
-            throw new IllegalArgumentException("Card number ID must be between 0 and 9999");
+        if (uid.length < 4 || uid.length > 7) {
+            throw new IllegalArgumentException(String.format("UID must be between 4 and 7 bytes (both inclusive), but has a length of: %s", uid.length));
         }
 
-        return new CardId(memberId, cardNumber, Objects.requireNonNull(uid));
+        return new CardId(memberId, uid);
     }
-
 }

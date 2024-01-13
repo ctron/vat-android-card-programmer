@@ -34,6 +34,7 @@ public class ListFragment extends Fragment {
     private static final String TAG = "ListFragment";
 
     private final int columnCount = 1;
+
     private RecyclerView recyclerView;
 
     public ListFragment() {
@@ -72,7 +73,7 @@ public class ListFragment extends Fragment {
             Log.w(TAG, "Missing card information");
         }
 
-        recyclerView.setAdapter(new CreatedCardRecyclerViewAdapter(cards));
+        recyclerView.setAdapter(new CreatedCardRecyclerViewAdapter(context, cards));
 
         // done
 

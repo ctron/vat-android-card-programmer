@@ -76,7 +76,7 @@ public class Writer extends BaseWriter {
     private void writeId() throws Exception {
         Log.i(TAG, "writeId");
 
-        final byte[][] data = Plain.encode(this.id);
+        final byte[] data = Plain.encode(this.id);
         writeWithKey(this.keys.getB(), WithKey.B, Block.Block0, data);
     }
 

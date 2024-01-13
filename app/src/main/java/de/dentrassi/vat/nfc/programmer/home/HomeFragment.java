@@ -9,26 +9,35 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.common.io.BaseEncoding;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.databinding.HomeFragmentBinding;
+import de.dentrassi.vat.nfc.programmer.model.AdditionalInformation;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
+import de.dentrassi.vat.nfc.programmer.model.IdType;
+import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
+import de.dentrassi.vat.nfc.programmer.utils.validation.Error;
+import de.dentrassi.vat.nfc.programmer.utils.validation.Ok;
+import de.dentrassi.vat.nfc.programmer.utils.validation.Result;
+import de.dentrassi.vat.nfc.programmer.utils.validation.TextValidator;
 
 public class HomeFragment extends Fragment {
 
@@ -63,17 +72,45 @@ public class HomeFragment extends Fragment {
 
         this.binding = HomeFragmentBinding.bind(view);
 
-
         this.binding.memberIdInput.setSelectAllOnFocus(true);
-        this.binding.cardNumberInput.setSelectAllOnFocus(true);
+        this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput) {
+            @Override
+            protected @NonNull Result validate(final String value) {
+                if (value.isEmpty()) {
+                    return Error.of(getString(R.string.validation_error_must_not_be_empty));
+                }
+
+                validateInput();
+
+                return Ok.of();
+            }
+        });
 
         this.binding.startWriteButton.setOnClickListener(this::onScheduleWrite);
         this.binding.startEraseButton.setOnClickListener(this::onScheduleErase);
         this.binding.cancelOperationButton.setOnClickListener(this::onCancelOperation);
 
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.id_types, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.binding.holderIdType.setAdapter(adapter);
+
+        validateInput();
         configChanged();
 
         return view;
+    }
+
+    private void validateInput() {
+        this.binding.startWriteButton.setEnabled(canWrite());
+    }
+
+    private boolean canWrite() {
+        if (this.binding.memberIdInput.getText() == null || this.binding.memberIdInput.getText().length() == 0) {
+            this.binding.startWriteButton.setEnabled(false);
+            return false;
+        }
+
+        return true;
     }
 
     public void configChanged() {
@@ -83,7 +120,7 @@ public class HomeFragment extends Fragment {
             this.binding.startEraseButton.setEnabled(false);
         } else {
             this.binding.writeOutcome.setText("");
-            this.binding.startWriteButton.setEnabled(true);
+            this.binding.startWriteButton.setEnabled(canWrite());
             this.binding.startEraseButton.setEnabled(true);
         }
     }
@@ -133,21 +170,23 @@ public class HomeFragment extends Fragment {
      */
     private void tagDiscovered(@NonNull final Intent intent, @NonNull final Tag tag) {
 
-
         switch (this.scheduledOperation) {
             case Write: {
                 try {
-                    final CardId id = CardId.of(
+                    final WriteCardInformation information = WriteCardInformation.of(
                             Integer.parseInt(this.binding.memberIdInput.getText().toString(), 10),
-                            Integer.parseInt(this.binding.cardNumberInput.getText().toString(), 10),
-                            UUID.randomUUID()
+                            AdditionalInformation.of(
+                                    this.binding.holderName.getText().toString(),
+                                    this.binding.holderId.getText().toString(),
+                                    IdType.fromOrdinal(this.binding.holderIdType.getSelectedItemPosition())
+                            )
                     );
                     final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
-                        setTagText("No keys present for writing");
+                        setTagText(getString(R.string.error_no_keys_present_for_writing));
                         return;
                     }
-                    new WriteAction(tag, keys, id, this::writeComplete).run();
+                    new WriteAction(tag, keys, information, this::writeComplete).run();
                 } catch (final Exception e) {
                     Log.w(TAG, "Failed to write tag", e);
                     setTagText(String.format("Failed to write tag: %s", e.getMessage()));
@@ -158,7 +197,7 @@ public class HomeFragment extends Fragment {
                 try {
                     final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
-                        setTagText("No keys present for writing");
+                        setTagText(getString(R.string.error_no_keys_present_for_writing));
                         return;
                     }
                     new EraseAction(tag, keys, this::eraseComplete).run();
@@ -191,7 +230,7 @@ public class HomeFragment extends Fragment {
     private void tagDiscoveredRead(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
         final Keys keys = getConfiguration().getKeysFor("VAT");
         if (keys == null) {
-            setTagText("Missing configuration");
+            setTagText(getString(R.string.error_missing_configuration));
             return;
         }
 
@@ -208,17 +247,17 @@ public class HomeFragment extends Fragment {
      * Called when a tag was read.
      */
     private void tagRead(final Tag tag, final CardId id) {
-        final StringBuilder sb = new StringBuilder("Tag discovered.").append("\n\n");
+        final StringBuilder sb = new StringBuilder(getString(R.string.message_tag_discovered)).append("\n\n");
 
         if (id != null) {
-            sb.append(String.format("Card Information: %s / %s", id.getMemberId(), id.getCardNumber()));
+            sb.append(String.format("Card Information: %s / %s", id.getMemberId(), BaseEncoding.base16().encode(id.getUid())));
         } else {
-            sb.append("No ID data detected");
+            sb.append(getString(R.string.message_no_id_data_detected));
         }
 
         if (tag.getTechList() != null) {
             if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
-                sb.append("\n\nTag can be used for access control.");
+                sb.append("\n\n").append(getString(R.string.message_tag_can_be_used_for_access_control));
             }
         }
 
@@ -266,9 +305,9 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void eraseComplete(final @Nullable String result, @Nullable final Exception ex) {
+    private void eraseComplete(final @Nullable byte[] result, @Nullable final Exception ex) {
         if (ex != null) {
-            this.binding.writeOutcome.setText(String.format("Failed to erase: %s", ex.getMessage()));
+            this.binding.writeOutcome.setText(String.format(getString(R.string.message_failed_to_erase), ex.getMessage()));
         } else {
             this.binding.writeOutcome.setText(R.string.message_tag_ereased);
         }
@@ -289,7 +328,7 @@ public class HomeFragment extends Fragment {
     }
 
     protected void onCancelOperation(final View view) {
-        writeComplete(null, new RuntimeException("Operation cancelled"));
+        writeComplete(null, new RuntimeException(getString(R.string.message_operation_cancelled)));
     }
 
     protected void onScheduleWrite(final View view) {

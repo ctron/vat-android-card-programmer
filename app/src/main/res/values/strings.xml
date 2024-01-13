@@ -22,5 +22,23 @@
     <string name="tab_config">Config</string>
     <string name="message_import_cancelled">Import cancelled</string>
     <string name="message_configuration_imported">Configuration imported</string>
+    <string name="title_additional_information">Additional Information</string>
+    <string name="hint_holder_name">Card holder name</string>
+    <string name="hint_holder_identification">Identification</string>
+    <string name="error_no_keys_present_for_writing">No keys present for writing</string>
+    <string name="error_missing_configuration">Missing configuration</string>
+    <string name="message_tag_discovered">Tag discovered.</string>
+    <string name="message_no_id_data_detected">No ID data detected</string>
+    <string name="message_tag_can_be_used_for_access_control">Tag can be used for access control.</string>
+    <string name="message_failed_to_erase">Failed to erase: %s</string>
+    <string name="message_operation_cancelled">Operation cancelled</string>
+    <string name="validation_error_must_not_be_empty">Must not be empty</string>
+
+    <string-array name="id_types">
+        <item>None</item>
+        <item>Card Number</item>
+        <item>Drivers license</item>
+        <item>Other</item>
+    </string-array>
 
 </resources>

@@ -2,6 +2,7 @@ package de.dentrassi.vat.nfc.programmer.data;
 
 import androidx.annotation.NonNull;
 
+import com.google.common.io.BaseEncoding;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriterBuilder;
@@ -17,11 +18,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
+import de.dentrassi.vat.nfc.programmer.model.AdditionalInformation;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
+import de.dentrassi.vat.nfc.programmer.model.IdType;
 
 public class CreatedCardsContent {
 
@@ -63,15 +66,15 @@ public class CreatedCardsContent {
      * @param entry the entry to add.
      */
     public void add(@NonNull final CreatedCard entry) {
-        this.entries.add(entry);
+        this.entries.add(0, entry);
     }
 
 
     /**
      * Remove card by tag UID.
      */
-    public void remove(@NonNull final String uid) {
-        this.entries.removeIf(card -> card.getUid().equals(uid));
+    public void remove(@NonNull final byte[] uid) {
+        this.entries.removeIf(card -> Arrays.equals(card.getId().getUid(), uid));
     }
 
     /**
@@ -89,15 +92,18 @@ public class CreatedCardsContent {
 
             String[] line;
             while ((line = csv.readNext()) != null) {
-                final String uid = line[0];
                 final CardId id = CardId.of(
                         Integer.parseInt(line[1], 10),
-                        Integer.parseInt(line[2], 10),
-                        UUID.fromString(line[3])
+                        BaseEncoding.base16().decode(line[0])
                 );
+                final String name = line[2];
+                final String identification = line[3];
+                final IdType identificationType = IdType.fromString(line[4]);
 
-                final ZonedDateTime timestamp = ZonedDateTime.parse(line[4]);
-                entries.add(new CreatedCard(uid, id, timestamp));
+                final AdditionalInformation additional = AdditionalInformation.of(name, identification, identificationType);
+
+                final ZonedDateTime timestamp = ZonedDateTime.parse(line[5]);
+                entries.add(CreatedCard.of(id, additional, timestamp));
             }
         }
 
@@ -127,19 +133,21 @@ public class CreatedCardsContent {
         )).build()) {
 
             csv.writeNext(new String[]{
-                    "Chip ID",
+                    "UID",
                     "Member ID",
-                    "User Number",
-                    "Card UID",
+                    "Name",
+                    "Identification",
+                    "Identification Type",
                     "Timestamp"
             });
 
             for (final CreatedCard card : this.entries) {
                 csv.writeNext(new String[]{
-                        card.getUid(),
+                        BaseEncoding.base16().encode(card.getId().getUid()),
                         Integer.toString(card.getId().getMemberId(), 10),
-                        Integer.toString(card.getId().getCardNumber(), 10),
-                        card.getId().getUid().toString(),
+                        card.getAdditional().getName(),
+                        card.getAdditional().getId(),
+                        card.getAdditional().getIdType().toString(),
                         card.getTimestamp().toString()
                 });
             }

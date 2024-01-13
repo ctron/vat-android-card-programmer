@@ -6,13 +6,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.common.io.BaseEncoding;
-
 import java.time.ZonedDateTime;
 import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
+import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.Writer;
 
@@ -21,14 +20,14 @@ public class WriteAction extends TagAction<CreatedCard> {
     private static final String TAG = WriteAction.class.getName();
 
     private final Keys keys;
-    private final CardId id;
+    private final WriteCardInformation information;
 
     public WriteAction(@NonNull final Tag tag,
                        @NonNull final Keys keys,
-                       @NonNull final CardId id,
+                       @NonNull final WriteCardInformation information,
                        @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
         super(tag, outcome);
-        this.id = id;
+        this.information = information;
         this.keys = keys;
     }
 
@@ -37,14 +36,19 @@ public class WriteAction extends TagAction<CreatedCard> {
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
-        new Writer(m, this.keys, this.id, 1)
-                .perform();
+        final byte[] uid = m.getTag().getId();
+        if (uid.length < 4 || uid.length > 7) {
+            throw new IllegalStateException(String.format("Card has a UID length of %s, which is not supported. It must be between 4 and 7 bytes long.", uid.length));
+        }
 
-        final String uid = BaseEncoding.base16().encode(m.getTag().getId());
+        final CardId id = CardId.of(this.information.getMemberId(), uid);
+
+        new Writer(m, this.keys, id, 1)
+                .perform();
 
         final ZonedDateTime timestamp = ZonedDateTime.now();
 
-        return new CreatedCard(uid, id, timestamp);
+        return CreatedCard.of(id, this.information.getAdditional(), timestamp);
     }
 
 }

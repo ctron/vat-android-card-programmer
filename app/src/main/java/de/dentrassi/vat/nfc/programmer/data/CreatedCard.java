@@ -5,18 +5,20 @@ import androidx.annotation.NonNull;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
+import de.dentrassi.vat.nfc.programmer.model.AdditionalInformation;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
 
-public class CreatedCard {
-    private final @NonNull String uid;
+public final class CreatedCard {
     private final @NonNull CardId id;
+    private final @NonNull AdditionalInformation additional;
     private final @NonNull ZonedDateTime timestamp;
 
-    public CreatedCard(@NonNull final String uid,
-                       @NonNull final CardId id,
-                       @NonNull final ZonedDateTime timestamp) {
-        this.uid = Objects.requireNonNull(uid);
+    private CreatedCard(
+            @NonNull final CardId id,
+            @NonNull final AdditionalInformation additional,
+            @NonNull final ZonedDateTime timestamp) {
         this.id = Objects.requireNonNull(id);
+        this.additional = Objects.requireNonNull(additional);
         this.timestamp = Objects.requireNonNull(timestamp);
     }
 
@@ -24,12 +26,20 @@ public class CreatedCard {
         return this.id;
     }
 
-    public @NonNull String getUid() {
-        return this.uid;
+    @NonNull
+    public AdditionalInformation getAdditional() {
+        return this.additional;
     }
 
     @NonNull
     public ZonedDateTime getTimestamp() {
         return this.timestamp;
+    }
+
+    public static CreatedCard of(
+            @NonNull final CardId id,
+            @NonNull final AdditionalInformation additional,
+            @NonNull final ZonedDateTime timestamp) {
+        return new CreatedCard(id, additional, timestamp);
     }
 }

@@ -17,17 +17,18 @@ VAT is expected to be present in sector 1.
 Rendered with: http://corkami.github.io/sbud/hexii.html
 
 ```
-hexii: [
-    "000001", "0001", 0, 0, 0, 0, 0, 0,
-    35, 219, 197, 221, 77, 118, 73, 117, 158, 161, 169, 211, 89, 3, 187, 40,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-],
+hexii: [].concat(
+    [
+        0x00, 0x0F, 0x42, 0x3F,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    ],
+    Array(32).fill(0)
+),
 descriptions: [
-    [6, "Member ID", "1"],
-    [4, "User Number", "1"],
-    [6, "Future use", ""],
-    [16, "Card UID", "23dbc5dd-4d76-4975-9ea1-a9d35903bb28"],
-    [16, "Future use", ""],
+    [4, "Member ID", "999999"],
+    [7, "Tag UID", ""],
+    [5, "Reserved", ""],
+    [32, "Future use", ""],
 ],
 ```
 
@@ -40,7 +41,7 @@ descriptions: [
 
 ```
 Block0: C1=1, C2=0, C3=0: read: A, B - write: B
-Block1: C1=1, C2=0, C3=0: read: A, B - write: B
+Block1: C1=0, C2=0, C3=0: read: A, B - write: A, B
 Block2: C1=0, C2=0, C3=0: read: A, B - write: A, B
 
 Block3: C1=0, C2=1, C3=1: write key A: B, write key B: B, write access bits: B

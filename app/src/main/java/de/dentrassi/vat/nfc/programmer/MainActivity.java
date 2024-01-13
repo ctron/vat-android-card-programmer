@@ -190,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
         cardsModified();
     }
 
-    public void removeCard(@NonNull final String tagUid) {
-        this.cards.remove(tagUid);
+    public void removeCard(@NonNull final byte[] uid) {
+        this.cards.remove(uid);
         cardsModified();
     }
 

@@ -21,4 +21,22 @@
     <string name="tab_config">Konfiguration</string>
     <string name="message_import_cancelled">Import abgebrochen</string>
     <string name="message_configuration_imported">Konfiguration importiert</string>
+    <string name="title_additional_information">Zusatzinformationen</string>
+    <string name="hint_holder_name">Name</string>
+    <string name="hint_holder_identification">Identifikation</string>
+
+    <string-array name="id_types">
+        <item>Keine</item>
+        <item>Kartennummer</item>
+        <item>Führerscheinummer</item>
+        <item>Sonstiges</item>
+    </string-array>
+    <string name="error_no_keys_present_for_writing">Schlüsselkonfiguration nicht gefunden</string>
+    <string name="error_missing_configuration">Keine Konfiguration</string>
+    <string name="message_tag_discovered">Chip erkannt.</string>
+    <string name="message_no_id_data_detected">Keine ID erkannt.</string>
+    <string name="message_tag_can_be_used_for_access_control">Chip kann für Zugriffskontrolle verwendet werden.</string>
+    <string name="message_failed_to_erase">Fehler beim Löschen: %s</string>
+    <string name="message_operation_cancelled">Operation abgebrochen</string>
+    <string name="validation_error_must_not_be_empty">Darf nicht leer sein</string>
 </resources>

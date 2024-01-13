@@ -39,9 +39,8 @@ public class ReadAction extends TagAction<CardId> {
             final int blockIndex = Tools.blockIndexFrom(m, 1, Block.Block0);
 
             try {
-                final byte[] data0 = m.readBlock(blockIndex);
-                final byte[] data1 = m.readBlock(blockIndex + 1);
-                return Plain.decode(data0, data1);
+                final byte[] data = m.readBlock(blockIndex);
+                return Plain.decode(data);
             } catch (final Exception e) {
                 // FIXME: should report error
                 Log.w("Failed to decode", e);

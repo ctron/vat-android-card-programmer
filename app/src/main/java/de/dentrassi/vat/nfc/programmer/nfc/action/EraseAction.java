@@ -6,14 +6,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.common.io.BaseEncoding;
-
 import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.Eraser;
 
-public class EraseAction extends TagAction<String> {
+public class EraseAction extends TagAction<byte[]> {
 
     private static final String TAG = EraseAction.class.getName();
 
@@ -21,12 +19,12 @@ public class EraseAction extends TagAction<String> {
 
     public EraseAction(@NonNull final Tag tag,
                        @NonNull final Keys keys,
-                       @NonNull final BiConsumer<String, Exception> outcome) {
+                       @NonNull final BiConsumer<byte[], Exception> outcome) {
         super(tag, outcome);
         this.keys = keys;
     }
 
-    protected String process() throws Exception {
+    protected byte[] process() throws Exception {
         Log.i(TAG, "Start erasing tag");
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
@@ -34,7 +32,7 @@ public class EraseAction extends TagAction<String> {
         new Eraser(m, this.keys, 1)
                 .perform();
 
-        return BaseEncoding.base16().encode(m.getTag().getId());
+        return m.getTag().getId();
     }
 
 }
