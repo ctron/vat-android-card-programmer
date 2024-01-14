@@ -66,6 +66,7 @@ public class CreatedCardsContent {
      * @param entry the entry to add.
      */
     public void add(@NonNull final CreatedCard entry) {
+        remove(entry.getId().getUid());
         this.entries.add(0, entry);
     }
 
