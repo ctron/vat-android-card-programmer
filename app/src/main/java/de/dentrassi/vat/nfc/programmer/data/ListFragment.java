@@ -33,12 +33,16 @@ public class ListFragment extends Fragment {
 
     private static final String TAG = "ListFragment";
 
+    private static final boolean ALLOW_CLEAR = false;
+
     private final int columnCount = 1;
 
     private RecyclerView recyclerView;
 
     public ListFragment() {
-        setHasOptionsMenu(true);
+        if (ALLOW_CLEAR) {
+            setHasOptionsMenu(true);
+        }
     }
 
     @Override
@@ -64,6 +68,8 @@ public class ListFragment extends Fragment {
             recyclerView.setLayoutManager(new GridLayoutManager(context, this.columnCount));
         }
 
+        // setup data
+
         final List<CreatedCard> cards;
         if (getActivity() instanceof MainActivity) {
             cards = ((MainActivity) getActivity()).getCards().getEntries();
@@ -82,7 +88,9 @@ public class ListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(final @NonNull Menu menu, final @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.data, menu);
+        if (ALLOW_CLEAR) {
+            inflater.inflate(R.menu.data, menu);
+        }
     }
 
     @Override
