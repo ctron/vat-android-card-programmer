@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainTab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -47,41 +48,63 @@
                 android:text="@string/title_additional_information"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-            <EditText
-                android:id="@+id/holderName"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_holder_name"
-                android:inputType="textPersonName"
-                android:minHeight="@dimen/min_edit_height"
-                android:singleLine="true"
-                android:text="" />
+                android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/holderId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_holder_identification"
-                android:inputType="text"
-                android:minHeight="@dimen/min_edit_height"
-                android:singleLine="true"
-                android:text="" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/holderName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_holder_name"
+                    android:inputType="textPersonName"
+                    android:minHeight="@dimen/min_edit_height"
+                    android:singleLine="true"
+                    android:text=""
+                    android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <Spinner
-                android:id="@+id/holderIdType"
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/holderId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_holder_identification"
+                    android:inputType="text"
+                    android:minHeight="@dimen/min_edit_height"
+                    android:singleLine="true"
+                    android:importantForAutofill="no"
+                    android:text="" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/min_edit_height" />
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+                <AutoCompleteTextView
+                    android:id="@+id/holderIdType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    app:simpleItems="@array/id_types"
+                    android:minHeight="@dimen/min_edit_height" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/text_margin">
 
                 <Button
                     android:id="@+id/startWriteButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/text_margin"
                     android:layout_weight="1"
                     android:text="@string/button_start_write" />
 
@@ -99,11 +122,12 @@
                     android:layout_weight="1"
                     android:text="@string/button_cancel_write"
                     android:visibility="gone"
+                    android:layout_marginEnd="@dimen/text_margin"
                     tools:visibility="visible" />
 
-                <ProgressBar
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:indeterminate="true"
                     android:id="@+id/writeProgress"
-                    style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"

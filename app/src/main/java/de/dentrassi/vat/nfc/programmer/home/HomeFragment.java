@@ -5,11 +5,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,7 +67,7 @@ public class HomeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(final @NonNull LayoutInflater inflater, final @Nullable ViewGroup container, final @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.home_fragment, container, false);
 
         this.binding = HomeFragmentBinding.bind(view);
@@ -89,10 +89,9 @@ public class HomeFragment extends Fragment {
         this.binding.startWriteButton.setOnClickListener(this::onScheduleWrite);
         this.binding.startEraseButton.setOnClickListener(this::onScheduleErase);
         this.binding.cancelOperationButton.setOnClickListener(this::onCancelOperation);
-
-        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.id_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.binding.holderIdType.setAdapter(adapter);
+        if (getContext() != null) {
+            this.binding.holderIdType.setText(getContext().getResources().getStringArray(R.array.id_types)[0], false);
+        }
 
         validateInput();
         configChanged();
@@ -156,7 +155,12 @@ public class HomeFragment extends Fragment {
                     return;
                 }
 
-                tagDiscovered(intent, tag);
+                try {
+                    tagDiscovered(intent, tag);
+                } catch (final Exception e) {
+                    Log.w(TAG, "Failed to initiate operation", e);
+                    writeComplete(null, e);
+                }
 
                 break;
 
@@ -164,6 +168,14 @@ public class HomeFragment extends Fragment {
                 break;
         }
 
+    }
+
+    private static String getOrDefault(final @Nullable Editable editable) {
+        if (editable != null) {
+            return editable.toString();
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -176,11 +188,11 @@ public class HomeFragment extends Fragment {
             case Write: {
                 try {
                     final WriteCardInformation information = WriteCardInformation.of(
-                            Integer.parseInt(this.binding.memberIdInput.getText().toString(), 10),
+                            Integer.parseInt(getOrDefault(this.binding.memberIdInput.getText()), 10),
                             AdditionalInformation.of(
-                                    this.binding.holderName.getText().toString(),
-                                    this.binding.holderId.getText().toString(),
-                                    IdType.fromOrdinal(this.binding.holderIdType.getSelectedItemPosition())
+                                    getOrDefault(this.binding.holderName.getText()),
+                                    getOrDefault(this.binding.holderId.getText()),
+                                    IdType.fromLocalizedText(getContext(), this.binding.holderIdType.getText())
                             )
                     );
                     final Keys keys = getConfiguration().getKeysFor("VAT");
@@ -192,6 +204,7 @@ public class HomeFragment extends Fragment {
                 } catch (final Exception e) {
                     Log.w(TAG, "Failed to write tag", e);
                     setTagText(String.format("Failed to write tag: %s", e.getMessage()));
+                    writeComplete(null, e);
                 }
                 break;
             }
