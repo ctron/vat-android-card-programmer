@@ -39,4 +39,5 @@
     <string name="message_failed_to_erase">Fehler beim Löschen: %s</string>
     <string name="message_operation_cancelled">Operation abgebrochen</string>
     <string name="validation_error_must_not_be_empty">Darf nicht leer sein</string>
+    <string name="title_export_of_cards">Exportiere Daten</string>
 </resources>

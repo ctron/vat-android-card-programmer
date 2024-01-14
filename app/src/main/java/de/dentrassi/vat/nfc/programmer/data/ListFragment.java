@@ -140,7 +140,7 @@ public class ListFragment extends Fragment {
 
         final Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TITLE, "Export of cards");
+        intent.putExtra(Intent.EXTRA_TITLE, getString(R.string.title_export_of_cards));
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

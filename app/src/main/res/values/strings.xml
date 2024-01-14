@@ -33,6 +33,7 @@
     <string name="message_failed_to_erase">Failed to erase: %s</string>
     <string name="message_operation_cancelled">Operation cancelled</string>
     <string name="validation_error_must_not_be_empty">Must not be empty</string>
+    <string name="title_export_of_cards">Export of cards</string>
 
     <string-array name="id_types">
         <item>None</item>
