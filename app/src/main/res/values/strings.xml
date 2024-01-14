@@ -35,6 +35,12 @@
     <string name="validation_error_must_not_be_empty">Must not be empty</string>
     <string name="title_export_of_cards">Export of cards</string>
     <string name="description_share_data">Share data</string>
+    <string name="message_unable_to_open_selected_file">Unable to open selected file</string>
+    <string name="text_key_a">Key A</string>
+    <string name="text_key_b">Key B</string>
+    <string name="hint_configuration_password">Configuration password</string>
+    <string name="error_import_failed">Import failed: %s</string>
+    <string name="error_unable_to_decode_configuration">Unable to decode configuration: %s</string>
 
     <string-array name="id_types">
         <item>None</item>

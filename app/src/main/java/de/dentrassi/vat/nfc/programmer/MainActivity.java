@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -21,12 +22,17 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.common.io.ByteStreams;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import javax.crypto.BadPaddingException;
 
 import de.dentrassi.vat.nfc.programmer.config.ConfigFragment;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
@@ -213,25 +219,60 @@ public class MainActivity extends AppCompatActivity {
         return this.configuration;
     }
 
-    public void importConfig() {
-        this.importConfig.launch("application/json");
+    public void importConfig(final String password) {
+        final SharedPreferences prefs = getSharedPreferences("ImportPassword", Context.MODE_PRIVATE);
+
+        final SharedPreferences.Editor edit = prefs.edit();
+        if (password != null) {
+            edit.putString("password", password);
+        } else {
+            edit.remove("password");
+        }
+        edit.apply();
+
+        this.importConfig.launch("*/*");
     }
 
     private void performImportConfig(final Uri uri) {
+
+        final SharedPreferences prefs = getSharedPreferences("ImportPassword", Context.MODE_PRIVATE);
+        final String password = prefs.getString("password", null);
+        prefs.edit().clear().apply();
+
         if (uri == null) {
             Toast.makeText(this, R.string.message_import_cancelled, Toast.LENGTH_LONG).show();
             return;
         }
 
         try (final InputStream in = getContentResolver().openInputStream(uri)) {
-            this.configuration = ConfigurationStore.load(in);
+            if (in == null) {
+                Toast.makeText(this, R.string.message_unable_to_open_selected_file, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (password != null && !password.isEmpty()) {
+                Log.d(TAG, "Loading config with password");
+                final String data = new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
+                this.configuration = ConfigurationStore.load(new ByteArrayInputStream(ConfigurationStore.decryptFromOpenSsl(data, password)));
+            } else {
+                Log.d(TAG, "Loading plain config");
+                this.configuration = ConfigurationStore.load(in);
+            }
+
             this.configuration.store(getConfigPath());
+
             Toast.makeText(this, R.string.message_configuration_imported, Toast.LENGTH_SHORT).show();
             this.configTab.configChanged();
             this.mainTab.configChanged();
         } catch (final Exception e) {
             Log.w(TAG, "Failed to import configuration", e);
-            Toast.makeText(this, String.format("Import failed: " + e), Toast.LENGTH_LONG).show();
+
+            if (e instanceof BadPaddingException) {
+                Toast.makeText(this, String.format(getString(R.string.error_unable_to_decode_configuration), e.getMessage()), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, String.format(getString(R.string.error_import_failed), e.getMessage()), Toast.LENGTH_LONG).show();
+            }
         }
+
     }
 }

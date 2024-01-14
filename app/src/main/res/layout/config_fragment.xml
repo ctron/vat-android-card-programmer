@@ -5,37 +5,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/import_password_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="@dimen/text_margin">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/import_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_configuration_password"
+            android:inputType="textPassword"
+            android:minHeight="@dimen/min_edit_height"
+            android:singleLine="true"
+            android:text="" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <Button
         android:id="@+id/importConfig"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="19dp"
+        android:layout_marginStart="@dimen/text_margin"
         android:text="@string/import_configuration"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/import_password_layout" />
 
     <View
         android:id="@+id/divider2"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="1dp"
+        android:layout_marginTop="@dimen/text_margin"
+        android:layout_marginBottom="@dimen/text_margin"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/importConfig" />
 
     <TableLayout
-        android:layout_width="409dp"
-        android:layout_height="647dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:paddingStart="@dimen/text_margin"
+        android:paddingEnd="@dimen/text_margin"
         app:layout_constraintTop_toBottomOf="@+id/divider2">
 
         <TableRow
@@ -46,9 +61,9 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="@dimen/text_margin"
-                android:text="Key A"
-                android:textAppearance="@android:style/TextAppearance.Material.Widget" />
+                android:paddingEnd="@dimen/text_margin"
+                android:text="@string/text_key_a"
+                android:textAppearance="@android:style/TextAppearance.Material.Body2" />
 
             <TextView
                 android:id="@+id/vatKeyA"
@@ -67,9 +82,9 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="@dimen/text_margin"
-                android:text="Key B"
-                android:textAppearance="@android:style/TextAppearance.Material.Widget" />
+                android:paddingEnd="@dimen/text_margin"
+                android:text="@string/text_key_b"
+                android:textAppearance="@android:style/TextAppearance.Material.Body2" />
 
             <TextView
                 android:id="@+id/vatKeyB"

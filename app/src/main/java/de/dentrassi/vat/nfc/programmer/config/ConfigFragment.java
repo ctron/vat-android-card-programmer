@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,26 +12,24 @@ import androidx.fragment.app.FragmentActivity;
 
 import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
+import de.dentrassi.vat.nfc.programmer.databinding.ConfigFragmentBinding;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 
 public class ConfigFragment extends Fragment {
 
-    private TextView vatKeyA;
-    private TextView vatKeyB;
+    private ConfigFragmentBinding binding;
 
     public ConfigFragment() {
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(final @NonNull LayoutInflater inflater, final @Nullable ViewGroup container, final @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.config_fragment, container, false);
 
-        final Button importButton = view.findViewById(R.id.importConfig);
-        importButton.setOnClickListener(this::onImportConfig);
+        this.binding = ConfigFragmentBinding.bind(view);
 
-        this.vatKeyA = view.findViewById(R.id.vatKeyA);
-        this.vatKeyB = view.findViewById(R.id.vatKeyB);
+        this.binding.importConfig.setOnClickListener(this::onImportConfig);
 
         configChanged();
 
@@ -43,8 +39,13 @@ public class ConfigFragment extends Fragment {
     protected void onImportConfig(final View view) {
         final FragmentActivity activity = getActivity();
 
+        String password = "";
+        if (this.binding.importPassword.getText() != null) {
+            password = this.binding.importPassword.getText().toString();
+        }
+
         if (activity instanceof MainActivity) {
-            ((MainActivity) activity).importConfig();
+            ((MainActivity) activity).importConfig(password);
         }
     }
 
@@ -60,11 +61,11 @@ public class ConfigFragment extends Fragment {
 
         final Keys keys = configuration.getKeysFor("VAT");
         if (keys == null) {
-            this.vatKeyA.setText(R.string.unset);
-            this.vatKeyB.setText(R.string.unset);
+            this.binding.vatKeyA.setText(R.string.unset);
+            this.binding.vatKeyB.setText(R.string.unset);
         } else {
-            this.vatKeyA.setText(keys.getA().toString());
-            this.vatKeyB.setText(keys.getB().toString());
+            this.binding.vatKeyA.setText(keys.getA().toString());
+            this.binding.vatKeyB.setText(keys.getB().toString());
         }
 
     }
