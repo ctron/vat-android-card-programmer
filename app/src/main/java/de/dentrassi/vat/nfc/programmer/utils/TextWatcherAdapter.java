@@ -3,7 +3,7 @@ package de.dentrassi.vat.nfc.programmer.utils;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-public class TextWatcherAdapter implements TextWatcher {
+public abstract class TextWatcherAdapter implements TextWatcher {
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
     }

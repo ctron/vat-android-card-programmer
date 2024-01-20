@@ -10,16 +10,20 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.common.io.ByteStreams;
@@ -45,6 +49,9 @@ import de.dentrassi.vat.nfc.programmer.home.HomeFragment;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    private final ActivityResultLauncher<String> importConfig = registerForActivityResult(new ActivityResultContracts.GetContent(), this::performImportConfig);
+
     private NfcAdapter adapter;
 
     private HomeFragment mainTab;
@@ -54,10 +61,11 @@ public class MainActivity extends AppCompatActivity {
     private CreatedCardsContent cards;
     private Configuration configuration = new Configuration();
 
-    private final ActivityResultLauncher<String> importConfig = registerForActivityResult(new ActivityResultContracts.GetContent(), this::performImportConfig);
+    private CoordinatorLayout coordinatorLayout;
+    private Snackbar snackbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.cards = new CreatedCardsContent(getFilesDir().toPath());
@@ -75,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        this.coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         final TabLayout tabLayout = findViewById(R.id.tabs);
         final ViewPager2 viewPager = findViewById(R.id.view_pager);
 
@@ -127,8 +136,27 @@ public class MainActivity extends AppCompatActivity {
         )
                 .attach();
 
+        this.snackbar = Snackbar.make(this.coordinatorLayout, "Configuration missing", Snackbar.LENGTH_INDEFINITE)
+                .setBehavior(new BaseTransientBottomBar.Behavior() {
+                    @Override
+                    public boolean canSwipeDismissView(View child) {
+                        return false;
+                    }
+                })
+                .setAction("Import", v -> {
+                    viewPager.setCurrentItem(2);
+                });
+        checkConfiguration();
 
         initNfc();
+    }
+
+    private void checkConfiguration() {
+        if (!hasConfiguration()) {
+            snackbar.show();
+        } else {
+            snackbar.dismiss();
+        }
     }
 
     private @NotNull Path getConfigPath() {
@@ -219,6 +247,10 @@ public class MainActivity extends AppCompatActivity {
         return this.configuration;
     }
 
+    public boolean hasConfiguration() {
+        return this.configuration != null && this.configuration.getKeysFor("VAT") != null;
+    }
+
     public void importConfig(final String password) {
         final SharedPreferences prefs = getSharedPreferences("ImportPassword", Context.MODE_PRIVATE);
 
@@ -273,6 +305,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, String.format(getString(R.string.error_import_failed), e.getMessage()), Toast.LENGTH_LONG).show();
             }
         }
+
+        checkConfiguration();
 
     }
 }

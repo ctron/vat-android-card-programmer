@@ -34,6 +34,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
+import de.dentrassi.vat.nfc.programmer.utils.TextWatcherAdapter;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Error;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Ok;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Result;
@@ -76,13 +77,21 @@ public class HomeFragment extends Fragment {
         this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput) {
             @Override
             protected @NonNull Result validate(final String value) {
+
+                validateInput();
+
                 if (value.isEmpty()) {
                     return Error.of(getString(R.string.validation_error_must_not_be_empty));
                 }
 
-                validateInput();
-
                 return Ok.of();
+            }
+        });
+
+        this.binding.holderIdType.addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(final Editable e) {
+                validateInput();
             }
         });
 
@@ -101,6 +110,11 @@ public class HomeFragment extends Fragment {
 
     private void validateInput() {
         this.binding.startWriteButton.setEnabled(canWrite());
+
+        final IdType type = IdType.fromLocalizedText(getContext(), binding.holderIdType.getText());
+        this.binding.holderIdTypeWrapper.setEnabled(type != IdType.None);
+
+        // FIXME: find something to validate
     }
 
     private boolean canWrite() {
@@ -114,11 +128,11 @@ public class HomeFragment extends Fragment {
 
     public void configChanged() {
         if (getConfiguration().getOrganizations().isEmpty()) {
-            this.binding.writeOutcome.setText(R.string.message_missing_configuration);
+            this.binding.warningMissingConfiguration.setVisibility(View.VISIBLE);
             this.binding.startWriteButton.setEnabled(false);
             this.binding.startEraseButton.setEnabled(false);
         } else {
-            this.binding.writeOutcome.setText("");
+            this.binding.warningMissingConfiguration.setVisibility(View.GONE);
             this.binding.startWriteButton.setEnabled(canWrite());
             this.binding.startEraseButton.setEnabled(true);
         }

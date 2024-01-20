@@ -33,8 +33,13 @@ public final class AdditionalInformation {
 
     public static AdditionalInformation of(
             @NotNull final String name,
-            @NotNull final String id,
+            @NotNull String id,
             @NotNull final IdType idType) {
+
+        if (!id.isEmpty() && idType == IdType.None) {
+            id = "";
+        }
+
         return new AdditionalInformation(name, id, idType);
     }
 
