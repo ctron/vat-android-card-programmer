@@ -61,11 +61,11 @@ public class ConfigFragment extends Fragment {
 
         final Keys keys = configuration.getKeysFor("VAT");
         if (keys == null) {
-            this.binding.vatKeyA.setText(R.string.unset);
-            this.binding.vatKeyB.setText(R.string.unset);
+            this.binding.vatKeyA.setText(R.string.key_missing);
+            this.binding.vatKeyB.setText(R.string.key_missing);
         } else {
-            this.binding.vatKeyA.setText(keys.getA().toString());
-            this.binding.vatKeyB.setText(keys.getB().toString());
+            this.binding.vatKeyA.setText(R.string.key_present);
+            this.binding.vatKeyB.setText(R.string.key_present);
         }
 
     }

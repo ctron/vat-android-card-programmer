@@ -4,7 +4,7 @@
     <string name="button_start_write">Chip schreiben</string>
     <string name="button_cancel_write">Abbruch</string>
     <string name="import_configuration">Konfiguration importieren</string>
-    <string name="unset">Leer</string>
+    <string name="key_missing">Fehlt</string>
     <string name="text_user">Benutzer</string>
     <string name="text_member">Mitglied</string>
     <string name="title_write_tag">Chip schreiben</string>
@@ -43,4 +43,10 @@
     <string name="title_export_of_cards">Exportiere Daten</string>
     <string name="description_share_data">Teile Daten</string>
     <string name="message_unable_to_open_selected_file">Ausgewählte Datei nicht gefunden</string>
+    <string name="text_key_a">Key A</string>
+    <string name="text_key_b">Key B</string>
+    <string name="hint_configuration_password">Passwort für Konfiguration</string>
+    <string name="error_import_failed">Import fehlgeschlagen: %s</string>
+    <string name="error_unable_to_decode_configuration">Fehler beim Verarbeiten der Konfiguration: %s</string>
+    <string name="key_present">Gesetzt</string>
 </resources>

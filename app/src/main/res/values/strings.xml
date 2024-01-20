@@ -4,7 +4,7 @@
     <string name="button_start_write">Write Tag</string>
     <string name="button_cancel_write">Cancel</string>
     <string name="import_configuration">Import Configuration</string>
-    <string name="unset">Unset</string>
+    <string name="key_missing">Unset</string>
     <string name="text_user">User</string>
     <string name="text_member">Member</string>
     <string name="title_write_tag">Write Tag</string>
@@ -41,6 +41,7 @@
     <string name="hint_configuration_password">Configuration password</string>
     <string name="error_import_failed">Import failed: %s</string>
     <string name="error_unable_to_decode_configuration">Unable to decode configuration: %s</string>
+    <string name="key_present">Present</string>
 
     <string-array name="id_types">
         <item>None</item>
