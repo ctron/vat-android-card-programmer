@@ -71,10 +71,6 @@ public class Key {
         return fromData(new byte[]{(byte) 0xA0, (byte) 0xA1, (byte) 0xA2, (byte) 0xA3, (byte) 0xA4, (byte) 0xA5});
     }
 
-    public static @NonNull Key emptyKey() {
-        return fromData(new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00});
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

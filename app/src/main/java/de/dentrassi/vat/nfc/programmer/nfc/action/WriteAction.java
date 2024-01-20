@@ -12,7 +12,9 @@ import java.util.function.BiConsumer;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
+import de.dentrassi.vat.nfc.programmer.nfc.ApplicationIds;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
+import de.dentrassi.vat.nfc.programmer.nfc.ops.WriteMad;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.Writer;
 
 public class WriteAction extends TagAction<CreatedCard> {
@@ -44,6 +46,8 @@ public class WriteAction extends TagAction<CreatedCard> {
         final CardId id = CardId.of(this.information.getMemberId(), uid);
 
         new Writer(m, this.keys, id, 1)
+                .perform();
+        new WriteMad(m, this.keys, 1, ApplicationIds.VAT)
                 .perform();
 
         final ZonedDateTime timestamp = ZonedDateTime.now();

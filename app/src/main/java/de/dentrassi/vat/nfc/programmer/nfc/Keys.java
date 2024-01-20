@@ -22,7 +22,7 @@ public class Keys {
     }
 
     public static @NonNull Keys defaultKeys() {
-        return new Keys(Key.emptyKey(), Key.defaultKey());
+        return new Keys(Key.defaultKey(), Key.defaultKey());
     }
 
     @Override
@@ -36,5 +36,9 @@ public class Keys {
     @Override
     public int hashCode() {
         return Objects.hash(a, b);
+    }
+
+    public static Keys of(@NonNull final Key a, @NonNull final Key b) {
+        return new Keys(a, b);
     }
 }
