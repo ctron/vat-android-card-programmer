@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Locale;
 
 import de.dentrassi.vat.nfc.programmer.R;
-import de.dentrassi.vat.nfc.programmer.databinding.FragmentItemBinding;
+import de.dentrassi.vat.nfc.programmer.databinding.DataFragmentItemBinding;
+import de.dentrassi.vat.nfc.programmer.model.IdType;
 
 public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<CreatedCardRecyclerViewAdapter.ViewHolder> {
 
@@ -32,7 +33,7 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
         return new ViewHolder(
-                FragmentItemBinding.inflate(
+                DataFragmentItemBinding.inflate(
                         LayoutInflater.from(parent.getContext()), parent, false));
     }
 
@@ -44,7 +45,13 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
         holder.memberIdView.setText(String.format(Locale.getDefault(), "%06d", item.getId().getMemberId()));
         holder.holderNameView.setText(item.getAdditional().getName());
         holder.holderIdView.setText(item.getAdditional().getId());
-        holder.holderIdTypeView.setText(this.context.getResources().getStringArray(R.array.id_types)[item.getAdditional().getIdType().ordinal()]);
+
+        if (item.getAdditional().getIdType() != IdType.None) {
+            holder.holderIdTypeView.setText(this.context.getResources().getStringArray(R.array.id_types)[item.getAdditional().getIdType().ordinal()]);
+        } else {
+            holder.holderIdTypeView.setText("");
+        }
+
         holder.timestampView.setText(item.getTimestamp()
                 .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
     }
@@ -62,7 +69,7 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
         public final TextView holderIdTypeView;
         public final TextView timestampView;
 
-        public ViewHolder(final FragmentItemBinding binding) {
+        public ViewHolder(final DataFragmentItemBinding binding) {
             super(binding.getRoot());
 
             this.uidView = binding.uid;

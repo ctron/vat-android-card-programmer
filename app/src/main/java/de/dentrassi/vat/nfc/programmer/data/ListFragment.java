@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDateTime;
@@ -51,21 +52,21 @@ public class ListFragment extends Fragment {
             final ViewGroup container,
             final Bundle savedInstanceState
     ) {
-        final View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        final View view = inflater.inflate(R.layout.data_fragment_list, container, false);
         this.recyclerView = view.findViewById(R.id.cardList);
 
         // action button
 
-        final FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.shareCards);
+        final FloatingActionButton fab = view.findViewById(R.id.shareCards);
         fab.setOnClickListener(x -> shareData());
 
         // list view
 
         final Context context = view.getContext();
         if (this.columnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            this.recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, this.columnCount));
+            this.recyclerView.setLayoutManager(new GridLayoutManager(context, this.columnCount));
         }
 
         // setup data
@@ -79,7 +80,12 @@ public class ListFragment extends Fragment {
             Log.w(TAG, "Missing card information");
         }
 
-        recyclerView.setAdapter(new CreatedCardRecyclerViewAdapter(context, cards));
+        this.recyclerView.setAdapter(new CreatedCardRecyclerViewAdapter(context, cards));
+
+        // make them look like list items
+
+        var divider = new MaterialDividerItemDecoration(this.recyclerView.getContext(), MaterialDividerItemDecoration.VERTICAL);
+        this.recyclerView.addItemDecoration(divider);
 
         // done
 
