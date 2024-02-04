@@ -1,9 +1,6 @@
 package de.dentrassi.vat.nfc.programmer.home;
 
-import android.content.Intent;
-import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -19,20 +16,17 @@ import com.google.common.io.BaseEncoding;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
 import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.databinding.HomeFragmentBinding;
 import de.dentrassi.vat.nfc.programmer.model.AdditionalInformation;
-import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.model.IdType;
 import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
+import de.dentrassi.vat.nfc.programmer.nfc.TagFragment;
 import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
-import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
 import de.dentrassi.vat.nfc.programmer.utils.TextWatcherAdapter;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Error;
@@ -40,7 +34,7 @@ import de.dentrassi.vat.nfc.programmer.utils.validation.Ok;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Result;
 import de.dentrassi.vat.nfc.programmer.utils.validation.TextValidator;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements TagFragment {
 
     private static final String TAG = "MainTab";
 
@@ -138,52 +132,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public void onNewIntent(final Intent intent) {
-        Log.i(TAG, String.format("New Intent: %s", intent));
-        Log.i(TAG, String.format("   Action: %s", intent.getAction()));
-        Log.i(TAG, String.format("   Data: %s", intent.getData()));
-        Log.i(TAG, String.format("   DataString: %s", intent.getDataString()));
-        Log.i(TAG, "   Extras:");
-
-        final Bundle bundle = intent.getExtras();
-        if (bundle != null && bundle.keySet() != null) {
-            for (final String key : bundle.keySet()) {
-                final Object value = bundle.get(key);
-                Log.i(TAG, String.format("       %s: %s", key, value));
-            }
-        }
-
-        if (intent.getAction() == null) {
-            return;
-        }
-
-        switch (intent.getAction()) {
-
-            case NfcAdapter.ACTION_ADAPTER_STATE_CHANGED:
-                break;
-
-            case NfcAdapter.ACTION_TAG_DISCOVERED:
-                final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-                if (tag == null) {
-                    Log.w(TAG, "Tag discovered, but provides no instance");
-                    return;
-                }
-
-                try {
-                    tagDiscovered(intent, tag);
-                } catch (final Exception e) {
-                    Log.w(TAG, "Failed to initiate operation", e);
-                    writeComplete(null, e);
-                }
-
-                break;
-
-            default:
-                break;
-        }
-
-    }
-
     private static String getOrDefault(final @Nullable Editable editable) {
         if (editable != null) {
             return editable.toString();
@@ -195,7 +143,7 @@ public class HomeFragment extends Fragment {
     /**
      * Called when a tag was discovered.
      */
-    private void tagDiscovered(@NonNull final Intent intent, @NonNull final Tag tag) {
+    public boolean tagDiscovered(@NonNull final Tag tag) {
         Log.d(TAG, String.format("Tag discovered - operation: %s", this.scheduledOperation));
 
         switch (this.scheduledOperation) {
@@ -212,7 +160,7 @@ public class HomeFragment extends Fragment {
                     final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
                         setTagText(getString(R.string.error_no_keys_present_for_writing));
-                        return;
+                        return true;
                     }
                     new WriteAction(tag, keys, information, this::writeComplete).run();
                 } catch (final Exception e) {
@@ -227,7 +175,7 @@ public class HomeFragment extends Fragment {
                     final Keys keys = getConfiguration().getKeysFor("VAT");
                     if (keys == null) {
                         setTagText(getString(R.string.error_no_keys_present_for_writing));
-                        return;
+                        return true;
                     }
                     new EraseAction(tag, keys, this::eraseComplete).run();
                 } catch (final Exception e) {
@@ -237,11 +185,11 @@ public class HomeFragment extends Fragment {
                 break;
             }
             case None: {
-                tagDiscoveredRead(intent, tag);
-                break;
+                return false;
             }
         }
 
+        return true;
     }
 
     /**
@@ -250,50 +198,7 @@ public class HomeFragment extends Fragment {
      * @param text the text to show
      */
     private void setTagText(final String text) {
-        this.binding.tagOutput.setText(text);
-    }
-
-    /**
-     * Called when a tag was discovered, and we are in read mode.
-     */
-    private void tagDiscoveredRead(@NonNull final Intent ignoredIntent, @NonNull final Tag tag) {
-        final Keys keys = getConfiguration().getKeysFor("VAT");
-        if (keys == null) {
-            setTagText(getString(R.string.error_missing_configuration));
-            return;
-        }
-
-        new ReadAction(tag, keys, (id, ex) -> {
-            if (ex instanceof ReadAction.UnableToReadException) {
-                setTagText(getString(R.string.message_either_wrong_encryption_keys_or_card_is_not_provisioned));
-                return;
-            } else if (ex != null) {
-                setTagText(String.format(getString(R.string.message_failed_to_read_tag), ex.getMessage()));
-                return;
-            }
-            tagRead(tag, id);
-        }).run();
-    }
-
-    /**
-     * Called when a tag was read.
-     */
-    private void tagRead(final Tag tag, final CardId id) {
-        final StringBuilder sb = new StringBuilder(getString(R.string.message_tag_discovered)).append("\n\n");
-
-        if (id != null) {
-            sb.append(String.format("Card Information: %s / %s", id.getMemberId(), BaseEncoding.base16().encode(id.getUid())));
-        } else {
-            sb.append(getString(R.string.message_no_id_data_detected));
-        }
-
-        if (tag.getTechList() != null) {
-            if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
-                sb.append("\n\n").append(getString(R.string.message_tag_can_be_used_for_access_control));
-            }
-        }
-
-        setTagText(sb.toString());
+        this.binding.writeOutcome.setText(text);
     }
 
     /**

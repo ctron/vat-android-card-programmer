@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".read.ReadFragment"
+    android:padding="@dimen/text_margin">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/header_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/header_card_information"
+        android:paddingBottom="@dimen/text_margin"
+        style="@style/TextAppearance.Material3.HeadlineMedium" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/infoCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="5dp"
+        android:padding="@dimen/text_margin">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:padding="@dimen/text_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/memberId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
+                tools:text="123456" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tagId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBaseline_toBaselineOf="@id/memberId"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="0011223344" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/infoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/text_margin"
+                app:layout_constraintTop_toBottomOf="@id/memberId"
+                tools:text="Some information text" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/text_margin"
+        tools:text="Some information text" />
+
+</LinearLayout>

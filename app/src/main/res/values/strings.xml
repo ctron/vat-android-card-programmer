@@ -17,7 +17,8 @@
     <string name="message_tag_written">Tag written</string>
     <string name="message_tag_ereased">Tag erased</string>
     <string name="message_missing_configuration">Missing configuration. Unable to provision new tags.</string>
-    <string name="tab_home">Tag</string>
+    <string name="tab_home">Write</string>
+    <string name="tab_read">Read</string>
     <string name="tab_data">Data</string>
     <string name="tab_config">Config</string>
     <string name="message_import_cancelled">Import cancelled</string>
@@ -44,6 +45,8 @@
     <string name="key_present">Present</string>
     <string name="message_failed_to_read_tag">Failed to read tag: %s</string>
     <string name="message_either_wrong_encryption_keys_or_card_is_not_provisioned">Either wrong encryption keys, or card is not provisioned.</string>
+    <string name="action_import">Import</string>
+    <string name="header_card_information">Tag Information</string>
 
     <string-array name="id_types">
         <item>None</item>

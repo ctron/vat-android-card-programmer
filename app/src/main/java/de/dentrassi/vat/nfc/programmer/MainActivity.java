@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,16 +46,22 @@ import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCardsContent;
 import de.dentrassi.vat.nfc.programmer.data.ListFragment;
 import de.dentrassi.vat.nfc.programmer.home.HomeFragment;
+import de.dentrassi.vat.nfc.programmer.read.ReadFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    enum Tabs {
+        Home, Read, Data, Config,
+    }
 
     private final ActivityResultLauncher<String> importConfig = registerForActivityResult(new ActivityResultContracts.GetContent(), this::performImportConfig);
 
     private NfcAdapter adapter;
 
     private HomeFragment mainTab;
+    private ReadFragment readTab;
     private ListFragment listTab;
     private ConfigFragment configTab;
 
@@ -63,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CoordinatorLayout coordinatorLayout;
     private Snackbar snackbar;
+    private Tag lateReadTag;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -83,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        this.coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        this.coordinatorLayout = findViewById(R.id.coordinatorLayout);
         final TabLayout tabLayout = findViewById(R.id.tabs);
         final ViewPager2 viewPager = findViewById(R.id.view_pager);
 
@@ -91,19 +99,27 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public Fragment createFragment(int position) {
-                switch (position) {
+                var tab = Tabs.values()[position];
+
+                switch (tab) {
                     default:
-                    case 0: {
+                    case Home: {
                         final HomeFragment result = new HomeFragment();
                         MainActivity.this.mainTab = result;
                         return result;
                     }
-                    case 1: {
+                    case Read: {
+                        Log.i(TAG, "Create read tab");
+                        final ReadFragment result = new ReadFragment(MainActivity.this.lateReadTag);
+                        MainActivity.this.readTab = result;
+                        return result;
+                    }
+                    case Data: {
                         final ListFragment result = new ListFragment();
                         MainActivity.this.listTab = result;
                         return result;
                     }
-                    case 2: {
+                    case Config: {
                         final ConfigFragment result = new ConfigFragment();
                         MainActivity.this.configTab = result;
                         return result;
@@ -113,23 +129,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int getItemCount() {
-                return 3;
+                return Tabs.values().length;
             }
         });
 
         new TabLayoutMediator(
                 tabLayout,
                 viewPager,
-                (tab, position) -> {
-                    switch (position) {
-                        case 0:
-                            tab.setText(R.string.tab_home);
+                (tabView, position) -> {
+                    var tab = Tabs.values()[position];
+                    switch (tab) {
+                        case Home:
+                            tabView.setText(R.string.tab_home);
                             break;
-                        case 1:
-                            tab.setText(R.string.tab_data);
+                        case Read:
+                            tabView.setText(R.string.tab_read);
                             break;
-                        case 2:
-                            tab.setText(R.string.tab_config);
+                        case Data:
+                            tabView.setText(R.string.tab_data);
+                            break;
+                        case Config:
+                            tabView.setText(R.string.tab_config);
                             break;
                     }
                 }
@@ -143,9 +163,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 })
-                .setAction("Import", v -> {
-                    viewPager.setCurrentItem(2);
-                });
+                .setAction(R.string.action_import, v -> setCurrentTab(Tabs.Config));
         checkConfiguration();
 
         initNfc();
@@ -207,10 +225,50 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
 
         Log.i(TAG, String.format("New Intent: %s", intent));
+        Log.i(TAG, String.format("   Action: %s", intent.getAction()));
+        Log.i(TAG, String.format("   Data: %s", intent.getData()));
+        Log.i(TAG, String.format("   DataString: %s", intent.getDataString()));
+        Log.i(TAG, "   Extras:");
 
-        if (this.mainTab != null && this.mainTab.isAdded()) {
-            this.mainTab.onNewIntent(intent);
+        final Bundle bundle = intent.getExtras();
+        if (bundle != null && bundle.keySet() != null) {
+            for (final String key : bundle.keySet()) {
+                final Object value = bundle.get(key);
+                Log.i(TAG, String.format("       %s: %s", key, value));
+            }
         }
+
+        if (intent.getAction() == null) {
+            return;
+        }
+
+        if (intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)) {
+            this.lateReadTag = null;
+
+            final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            if (tag == null) {
+                Log.w(TAG, "Tag discovered, but provided no instance");
+                return;
+            }
+
+            var handled = false;
+            if (this.mainTab != null && this.mainTab.isAdded()) {
+                handled = this.mainTab.tagDiscovered(tag);
+                Log.d(TAG, "main tab handled: " + handled);
+            }
+            if (!handled) {
+                if (this.readTab != null && this.readTab.isAdded()) {
+                    handled = this.readTab.tagDiscovered(tag);
+                    Log.d(TAG, "read tab handled: " + handled);
+                } else {
+                    // record that state
+                    this.lateReadTag = tag;
+                }
+                setCurrentTab(Tabs.Read);
+            }
+
+        }
+
     }
 
     void notifyCardsChange() {
@@ -309,4 +367,24 @@ public class MainActivity extends AppCompatActivity {
         checkConfiguration();
 
     }
+
+    /**
+     * Get the current tab.
+     *
+     * @return The current tab, falling back to {@link Tabs#Home} in case of errors.
+     */
+    private Tabs getCurrentTab() {
+        final ViewPager2 viewPager = findViewById(R.id.view_pager);
+        try {
+            return Tabs.values()[viewPager.getCurrentItem()];
+        } catch (final Exception e) {
+            return Tabs.Home;
+        }
+    }
+
+    private void setCurrentTab(@NonNull final Tabs tab) {
+        final ViewPager2 viewPager = findViewById(R.id.view_pager);
+        viewPager.setCurrentItem(tab.ordinal());
+    }
+
 }
