@@ -6,10 +6,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.Eraser;
+import de.dentrassi.vat.nfc.programmer.nfc.ops.WriteMad;
 
 public class EraseAction extends TagAction<byte[]> {
 
@@ -29,6 +31,7 @@ public class EraseAction extends TagAction<byte[]> {
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
+        new WriteMad(m, this.keys, List.of()).perform();
         new Eraser(m, this.keys, 1)
                 .perform();
 
