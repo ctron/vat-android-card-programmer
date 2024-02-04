@@ -21,7 +21,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.SectorTrailer;
 /**
  * Write information to card
  */
-public class Writer extends BaseWriter {
+public class Writer extends BaseOperation<Void> {
 
     private static final String TAG = Writer.class.getName();
 
@@ -38,9 +38,11 @@ public class Writer extends BaseWriter {
     }
 
     @Override
-    protected void write() throws Exception {
+    public Void perform() throws Exception {
         writeAccess();
         writeId();
+
+        return null;
     }
 
     /**

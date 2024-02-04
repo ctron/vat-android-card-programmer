@@ -1,5 +1,6 @@
 package de.dentrassi.vat.nfc.programmer.home;
 
+import android.annotation.SuppressLint;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.Editable;
@@ -162,7 +163,7 @@ public class HomeFragment extends Fragment implements TagFragment {
                         setTagText(getString(R.string.error_no_keys_present_for_writing));
                         return true;
                     }
-                    new WriteAction(tag, keys, information, this::writeComplete).run();
+                    new WriteAction(tag, keys, information, false, this::writeComplete).run();
                 } catch (final Exception e) {
                     Log.w(TAG, "Failed to write tag", e);
                     setTagText(String.format("Failed to write tag: %s", e.getMessage()));
@@ -230,11 +231,15 @@ public class HomeFragment extends Fragment implements TagFragment {
 
     }
 
+    @SuppressLint("StringFormatMatches")
     private void writeComplete(final @Nullable CreatedCard result, @Nullable final Exception ex) {
         Log.d(TAG, String.format("writeComplete - result: %s, ex: %s", result, ex));
 
-        if (ex != null) {
-            this.binding.writeOutcome.setText(String.format("Failed to write: %s", ex.getMessage()));
+        if (ex instanceof WriteAction.AlreadyProvisioned) {
+            var memberId = ((WriteAction.AlreadyProvisioned) ex).getId().getMemberId();
+            this.binding.writeOutcome.setText(String.format(getString(R.string.error_already_provisioned), memberId));
+        } else if (ex != null) {
+            this.binding.writeOutcome.setText(String.format(getString(R.string.error_failed_to_write), ex.getMessage()));
         } else {
             this.binding.writeOutcome.setText(R.string.message_tag_written);
         }

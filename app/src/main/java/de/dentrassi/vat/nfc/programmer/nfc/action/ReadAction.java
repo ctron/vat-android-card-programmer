@@ -2,22 +2,19 @@ package de.dentrassi.vat.nfc.programmer.nfc.action;
 
 import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.util.function.BiConsumer;
 
-import de.dentrassi.vat.nfc.programmer.codec.Plain;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
-import de.dentrassi.vat.nfc.programmer.nfc.Block;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
-import de.dentrassi.vat.nfc.programmer.nfc.Tools;
+import de.dentrassi.vat.nfc.programmer.nfc.ops.Reader;
 
 public class ReadAction extends TagAction<CardId> {
 
-    public static class UnableToReadException extends Exception {
-        UnableToReadException() {
+    public static class UnauthorizedToReadException extends Exception {
+        public UnauthorizedToReadException() {
             super("Not authorized. Unprovisioned card or wrong key.");
         }
     }
@@ -34,24 +31,10 @@ public class ReadAction extends TagAction<CardId> {
     protected CardId process() throws Exception {
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
+        m.connect();
         try (m) {
-            m.connect();
-
-            if (!m.authenticateSectorWithKeyB(1, this.keys.getB().getKey())) {
-                throw new UnableToReadException();
-            }
-
-            final int blockIndex = Tools.blockIndexFrom(m, 1, Block.Block0);
-
-            try {
-                final byte[] data = m.readBlock(blockIndex);
-                return Plain.decode(data);
-            } catch (final Exception e) {
-                // FIXME: should report error
-                Log.w("Failed to decode", e);
-                return null;
-            }
-
+            return new Reader(m, this.keys, 1)
+                    .perform();
         }
     }
 }

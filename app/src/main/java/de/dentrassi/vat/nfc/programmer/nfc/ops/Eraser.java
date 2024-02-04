@@ -11,7 +11,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.Block;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.SectorTrailer;
 
-public class Eraser extends BaseWriter {
+public class Eraser extends BaseOperation<Void> {
 
     private static final String TAG = Eraser.class.getName();
 
@@ -26,9 +26,11 @@ public class Eraser extends BaseWriter {
     }
 
     @Override
-    protected void write() throws Exception {
+    public Void perform() throws Exception {
         eraseId();
         eraseAccess();
+
+        return null;
     }
 
     private void eraseAccess() throws IOException {

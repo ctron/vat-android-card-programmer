@@ -31,11 +31,15 @@ public class EraseAction extends TagAction<byte[]> {
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
-        new WriteMad(m, this.keys, List.of()).perform();
-        new Eraser(m, this.keys, 1)
-                .perform();
+        m.connect();
+        try (m) {
+            new WriteMad(m, this.keys, List.of()).perform();
+            new Eraser(m, this.keys, 1)
+                    .perform();
 
-        return m.getTag().getId();
+            return m.getTag().getId();
+        }
+
     }
 
 }

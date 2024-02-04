@@ -10,7 +10,7 @@ import java.util.function.Function;
 public abstract class TagAction<T> extends BlockingAction<T> {
     protected final Tag tag;
 
-    protected TagAction(@NonNull Tag tag, @NonNull final BiConsumer<T, Exception> handler) {
+    protected TagAction(@NonNull final Tag tag, @NonNull final BiConsumer<T, Exception> handler) {
         super(handler);
         this.tag = tag;
     }
@@ -23,7 +23,7 @@ public abstract class TagAction<T> extends BlockingAction<T> {
      * @param <U>       The actual type
      * @return The tag specific instance.
      */
-    protected <U> @NonNull U getTagAs(@NonNull Function<Tag, U> getter, @NonNull String otherwise) {
+    protected <U> @NonNull U getTagAs(@NonNull final Function<Tag, U> getter, @NonNull final String otherwise) {
         final U tag = getter.apply(this.tag);
         if (tag != null) {
             return tag;

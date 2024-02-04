@@ -53,4 +53,40 @@ public class CardId {
 
         return new CardId(memberId, uid);
     }
+
+    /**
+     * Check if an ID is empty, all zeroes.
+     *
+     * @return {@code true} if the card is empty, {@code false} otherwise.
+     */
+    public boolean isEmpty() {
+        for (byte b : this.uid) {
+            if (b > 0) {
+                return false;
+            }
+        }
+
+        return this.memberId == 0;
+    }
+
+    /**
+     * Ensure that the encoded UID matches the tag UID.
+     *
+     * @param tagId The UID from the tag
+     * @return {@code true} if the UIDs match, {@code false} otherwise.
+     */
+    public boolean validateUid(byte[] tagId) {
+        int len = Math.max(tagId.length, this.uid.length);
+
+        for (int i = 0; i < len; i++) {
+            byte a = i >= this.uid.length ? 0 : this.uid[i];
+            byte b = i >= tagId.length ? 0 : tagId[i];
+
+            if (a != b) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

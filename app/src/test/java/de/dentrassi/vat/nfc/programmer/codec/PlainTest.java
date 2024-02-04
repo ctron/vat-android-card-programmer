@@ -17,6 +17,7 @@ public class PlainTest {
 
         Assert.assertEquals(123, id.getMemberId());
         Assert.assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7}, id.getUid());
+        Assert.assertFalse(id.isEmpty());
     }
 
     @Test
@@ -25,6 +26,7 @@ public class PlainTest {
 
         Assert.assertEquals(0, id.getMemberId());
         Assert.assertArrayEquals(new byte[]{0, 0, 0, 0, 0, 0, 0}, id.getUid());
+        Assert.assertTrue(id.isEmpty());
     }
 
     @Test
@@ -55,6 +57,6 @@ public class PlainTest {
 
         final CardId result = Plain.decode(data);
         Assert.assertEquals(999999, result.getMemberId());
-
+        Assert.assertFalse(result.isEmpty());
     }
 }

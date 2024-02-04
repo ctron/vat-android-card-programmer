@@ -15,8 +15,8 @@ import de.dentrassi.vat.nfc.programmer.nfc.Key;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
-public abstract class BaseWriter {
-    private static final String TAG = BaseWriter.class.getName();
+public abstract class BaseOperation<R> {
+    private static final String TAG = BaseOperation.class.getName();
 
     protected final @NonNull MifareClassic card;
     protected final @NonNull Keys keys;
@@ -26,7 +26,7 @@ public abstract class BaseWriter {
         A, B
     }
 
-    public BaseWriter(
+    public BaseOperation(
             final @NonNull MifareClassic card,
             final @NonNull Keys keys,
             int sector
@@ -36,16 +36,7 @@ public abstract class BaseWriter {
         this.sector = sector;
     }
 
-    protected abstract void write() throws Exception;
-
-    public void perform() throws Exception {
-        this.card.connect();
-        try {
-            write();
-        } finally {
-            this.card.close();
-        }
-    }
+    public abstract R perform() throws Exception;
 
     /**
      * Perform a write operation with a provided key.

@@ -23,7 +23,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.SectorTrailer;
  * <strong>NOTE: </strong> This needs to be extended in a way that it actually reads/updates/writes
  * an existing MAD.
  */
-public class WriteMad extends BaseWriter {
+public class WriteMad extends BaseOperation<Void> {
     private static final String TAG = WriteMad.class.getName();
 
     private final List<Consumer<Directory>> updates;
@@ -57,9 +57,11 @@ public class WriteMad extends BaseWriter {
     }
 
     @Override
-    protected void write() throws Exception {
+    public Void perform() throws Exception {
         writeAccess();
         writeData();
+
+        return null;
     }
 
     private void writeAccess() throws Exception {

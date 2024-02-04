@@ -26,6 +26,7 @@ import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.TagFragment;
 import de.dentrassi.vat.nfc.programmer.nfc.action.ReadAction;
+import de.dentrassi.vat.nfc.programmer.nfc.ops.Reader;
 
 public class ReadFragment extends Fragment implements TagFragment {
 
@@ -70,11 +71,23 @@ public class ReadFragment extends Fragment implements TagFragment {
         }
 
         new ReadAction(tag, keys, (id, ex) -> {
-            Log.i(TAG, String.format("Read complete - id: %s, ex: %s", id, ex));
+            Log.i(TAG, String.format("Read complete - id: %s", id), ex);
 
-            if (ex instanceof ReadAction.UnableToReadException) {
+            if (ex instanceof ReadAction.UnauthorizedToReadException) {
                 this.binding.infoCard.setVisibility(View.GONE);
-                setTagText(getString(R.string.message_either_wrong_encryption_keys_or_card_is_not_provisioned));
+                final StringBuilder sb = new StringBuilder(getString(R.string.message_either_wrong_encryption_keys_or_card_is_not_provisioned));
+                if (isSupportedCard(tag)) {
+                    sb.append(' ');
+                    sb.append(getString(R.string.message_tag_can_be_used_for_access_control));
+                }
+                setTagText(sb.toString());
+            } else if (ex instanceof Reader.RecordValidationFailed) {
+                this.binding.infoCard.setVisibility(View.GONE);
+                var err = ((Reader.RecordValidationFailed) ex);
+                setTagText(String.format("Mismatch of provisioned card UID (record: %s, tag: %s)",
+                        BaseEncoding.base16().encode(err.getCard()),
+                        BaseEncoding.base16().encode(err.getTag())
+                ));
             } else if (ex != null) {
                 this.binding.infoCard.setVisibility(View.GONE);
                 setTagText(String.format(getString(R.string.message_failed_to_read_tag), ex.getMessage()));
@@ -90,17 +103,24 @@ public class ReadFragment extends Fragment implements TagFragment {
         return true;
     }
 
-    private void tagReadEmpty(Tag tag) {
+    private void tagReadEmpty(@NonNull final Tag tag) {
         this.binding.memberId.setText("n/a");
         this.binding.tagId.setText(BaseEncoding.base16().encode(tag.getId()));
         this.binding.infoText.setText("");
         setTagText("");
 
+        if (isSupportedCard(tag)) {
+            this.binding.infoText.setText(R.string.message_tag_can_be_used_for_access_control);
+        }
+    }
+
+    private static boolean isSupportedCard(@NonNull final Tag tag) {
         if (tag.getTechList() != null) {
             if (Arrays.stream(tag.getTechList()).anyMatch(tech -> MifareClassic.class.getName().equals(tech))) {
-                this.binding.infoText.setText(R.string.message_tag_can_be_used_for_access_control);
+                return true;
             }
         }
+        return false;
     }
 
     /**

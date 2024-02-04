@@ -54,4 +54,6 @@
     <string name="message_either_wrong_encryption_keys_or_card_is_not_provisioned">Falsche Schlüsselkonfiguration oder unprovisionierter Chip.</string>
     <string name="action_import">Importieren</string>
     <string name="header_card_information">Chip Informationen</string>
+    <string name="error_failed_to_write">Schreibfehler: %s</string>
+    <string name="error_already_provisioned">Chip wurde schon für Mitglied %s provisioniert. Der Chip muss gelöscht werden, bevor er wieder beschrieben werden kann.</string>
 </resources>

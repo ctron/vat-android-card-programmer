@@ -23,6 +23,7 @@ public final class Plain {
 
         out.putInt(id.getMemberId());
         out.put(id.getUid());
+        // NOTE: if we encode more data, we need to pad this UID to 7 bytes, right now it doesn't matter
 
         // return result
 
