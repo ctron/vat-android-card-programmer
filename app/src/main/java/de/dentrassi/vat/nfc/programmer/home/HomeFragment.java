@@ -264,8 +264,11 @@ public class HomeFragment extends Fragment {
         }
 
         new ReadAction(tag, keys, (id, ex) -> {
-            if (ex != null) {
-                setTagText(String.format("Failed to read tag: %s", ex.getMessage()));
+            if (ex instanceof ReadAction.UnableToReadException) {
+                setTagText(getString(R.string.message_either_wrong_encryption_keys_or_card_is_not_provisioned));
+                return;
+            } else if (ex != null) {
+                setTagText(String.format(getString(R.string.message_failed_to_read_tag), ex.getMessage()));
                 return;
             }
             tagRead(tag, id);

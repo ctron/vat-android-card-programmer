@@ -16,6 +16,12 @@ import de.dentrassi.vat.nfc.programmer.nfc.Tools;
 
 public class ReadAction extends TagAction<CardId> {
 
+    public static class UnableToReadException extends Exception {
+        UnableToReadException() {
+            super("Not authorized. Unprovisioned card or wrong key.");
+        }
+    }
+
     private final Keys keys;
 
     public ReadAction(@NonNull final Tag tag,
@@ -28,12 +34,11 @@ public class ReadAction extends TagAction<CardId> {
     protected CardId process() throws Exception {
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
 
-        m.connect();
-        try {
+        try (m) {
+            m.connect();
 
             if (!m.authenticateSectorWithKeyB(1, this.keys.getB().getKey())) {
-                // FIXME: check for either case an provide a better message
-                throw new Exception("Not authorized. Unprovisioned card or wrong key.");
+                throw new UnableToReadException();
             }
 
             final int blockIndex = Tools.blockIndexFrom(m, 1, Block.Block0);
@@ -47,8 +52,6 @@ public class ReadAction extends TagAction<CardId> {
                 return null;
             }
 
-        } finally {
-            m.close();
         }
     }
 }
