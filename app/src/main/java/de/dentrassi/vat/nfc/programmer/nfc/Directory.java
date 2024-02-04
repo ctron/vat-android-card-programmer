@@ -35,8 +35,6 @@ public class Directory {
     }
 
     private void updateCrc() {
-        int len = this.buffer.array().length;
-        // byte crc = ((byte) (CRC8.compute(this.buffer.array(), 1, len - 1, 0xE3) & 0xFF));
         byte crc = calcCrc(this.buffer.array(), 1);
         this.buffer.put(0, crc);
     }
