@@ -28,8 +28,10 @@ import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.TagFragment;
 import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
+import de.dentrassi.vat.nfc.programmer.utils.Editables;
 import de.dentrassi.vat.nfc.programmer.utils.TextWatcherAdapter;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Error;
+import de.dentrassi.vat.nfc.programmer.utils.validation.FormValidator;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Ok;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Result;
 import de.dentrassi.vat.nfc.programmer.utils.validation.TextValidator;
@@ -37,6 +39,8 @@ import de.dentrassi.vat.nfc.programmer.utils.validation.TextValidator;
 public class HomeFragment extends Fragment implements TagFragment {
 
     private static final String TAG = "MainTab";
+
+    private final FormValidator validator = new FormValidator(this::validateInput, ok -> this.binding.startWriteButton.setEnabled(ok));
 
     private HomeFragmentBinding binding;
 
@@ -67,12 +71,12 @@ public class HomeFragment extends Fragment implements TagFragment {
 
         this.binding = HomeFragmentBinding.bind(view);
 
+        this.validator.reset();
+
         this.binding.memberIdInput.setSelectAllOnFocus(true);
-        this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput) {
+        this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput, validator) {
             @Override
             protected @NonNull Result validate(final String value) {
-
-                validateInput();
 
                 if (value.isEmpty()) {
                     return Error.of(getString(R.string.validation_error_must_not_be_empty));
@@ -82,10 +86,17 @@ public class HomeFragment extends Fragment implements TagFragment {
             }
         });
 
+        this.binding.holderId.addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                validator.validate();
+            }
+        });
+
         this.binding.holderIdType.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(final Editable e) {
-                validateInput();
+                validator.validate();
             }
         });
 
@@ -96,28 +107,40 @@ public class HomeFragment extends Fragment implements TagFragment {
             this.binding.holderIdType.setText(getContext().getResources().getStringArray(R.array.id_types)[0], false);
         }
 
-        validateInput();
+        validator.validate();
         configChanged();
 
         return view;
     }
 
-    private void validateInput() {
-        this.binding.startWriteButton.setEnabled(canWrite());
-
-        final IdType type = IdType.fromLocalizedText(getContext(), binding.holderIdType.getText());
+    private Result validateInput() {
+        final IdType type = IdType.fromLocalizedText(getContext(), this.binding.holderIdType.getText());
         this.binding.holderIdTypeWrapper.setEnabled(type != IdType.None);
 
-        // FIXME: find something to validate
-    }
+        this.binding.holderIdTypeWrapper.setError(null);
 
-    private boolean canWrite() {
-        if (this.binding.memberIdInput.getText() == null || this.binding.memberIdInput.getText().length() == 0) {
-            this.binding.startWriteButton.setEnabled(false);
-            return false;
+        switch (type) {
+            case CardNumber:
+                return Result.runWith(this.binding.holderIdTypeWrapper, () -> {
+                    var cardNumber = Editables.getText(this.binding.holderId.getText());
+
+                    if (cardNumber.isEmpty()) {
+                        return Error.of(getString(R.string.error_card_number_must_not_be_empty));
+                    }
+
+                    try {
+                        Integer.parseInt(cardNumber);
+                    } catch (Exception e) {
+                        return Error.of(String.format(getString(R.string.error_card_number_must_be_a_number_was), cardNumber));
+                    }
+
+                    return null;
+                });
+            default:
+                break;
         }
 
-        return true;
+        return Ok.of();
     }
 
     public void configChanged() {
@@ -127,8 +150,9 @@ public class HomeFragment extends Fragment implements TagFragment {
             this.binding.startEraseButton.setEnabled(false);
         } else {
             this.binding.warningMissingConfiguration.setVisibility(View.GONE);
-            this.binding.startWriteButton.setEnabled(canWrite());
             this.binding.startEraseButton.setEnabled(true);
+            // re-validate for the startWriteButton
+            this.validator.validate();
         }
     }
 
