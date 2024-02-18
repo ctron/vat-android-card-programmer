@@ -1,5 +1,9 @@
 package de.dentrassi.vat.nfc.programmer.model;
 
+import androidx.annotation.NonNull;
+
+import com.google.common.base.MoreObjects;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -48,4 +52,26 @@ public final class AdditionalInformation {
         return new AdditionalInformation("", "", IdType.None);
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("name", this.name)
+                .add("id", this.id)
+                .add("idType", this.idType)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AdditionalInformation that = (AdditionalInformation) o;
+        return Objects.equals(this.name, that.name) && Objects.equals(this.id, that.id) && this.idType == that.idType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.name, this.id, this.idType);
+    }
 }

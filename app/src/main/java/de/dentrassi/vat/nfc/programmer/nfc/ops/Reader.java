@@ -68,8 +68,8 @@ public class Reader extends BaseOperation<CardId> {
 
         if (!id.validateUid(tagId)) {
             Log.d(TAG, "Tag:  " + Arrays.toString(tagId));
-            Log.d(TAG, "Card: " + Arrays.toString(id.getUid()));
-            throw new RecordValidationFailed(id.getUid(), tagId);
+            Log.d(TAG, "Card: " + id.getUid());
+            throw new RecordValidationFailed(id.getUid().getUid(), tagId);
         }
 
         return id;

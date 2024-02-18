@@ -42,10 +42,12 @@ import javax.crypto.BadPaddingException;
 import de.dentrassi.vat.nfc.programmer.config.ConfigFragment;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
 import de.dentrassi.vat.nfc.programmer.config.ConfigurationStore;
-import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CardEntry;
+import de.dentrassi.vat.nfc.programmer.data.CreatedCardStorage;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCardsContent;
 import de.dentrassi.vat.nfc.programmer.data.ListFragment;
 import de.dentrassi.vat.nfc.programmer.home.HomeFragment;
+import de.dentrassi.vat.nfc.programmer.model.Uid;
 import de.dentrassi.vat.nfc.programmer.read.ReadFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private ListFragment listTab;
     private ConfigFragment configTab;
 
+    private CreatedCardStorage cardStorage;
     private CreatedCardsContent cards;
     private Configuration configuration = new Configuration();
 
@@ -76,9 +79,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.cards = new CreatedCardsContent(getFilesDir().toPath());
+        this.cardStorage = new CreatedCardStorage(getFilesDir().toPath());
+        this.cards = new CreatedCardsContent();
         try {
-            this.cards.load();
+            this.cards.load(this.cardStorage);
         } catch (final Exception e) {
             Log.w(TAG, "Failed to load cards", e);
         }
@@ -220,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
@@ -277,19 +282,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addCard(@NonNull final CreatedCard card) {
+    public void addCard(@NonNull final CardEntry card) {
         this.cards.add(card);
         cardsModified();
     }
 
-    public void removeCard(@NonNull final byte[] uid) {
-        this.cards.remove(uid);
+    public void removeCard(@NonNull final Uid uid) {
+        this.cards.erase(uid);
         cardsModified();
     }
 
     private void cardsModified() {
         try {
-            this.cards.store();
+            this.cards.store(this.cardStorage);
         } catch (final Exception e) {
             Log.w(TAG, "Failed to store cards", e);
         }
@@ -385,6 +390,11 @@ public class MainActivity extends AppCompatActivity {
     private void setCurrentTab(@NonNull final Tabs tab) {
         final ViewPager2 viewPager = findViewById(R.id.view_pager);
         viewPager.setCurrentItem(tab.ordinal());
+    }
+
+
+    public CreatedCardStorage getCardStorage() {
+        return this.cardStorage;
     }
 
 }

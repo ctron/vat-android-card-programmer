@@ -128,7 +128,7 @@ public class ReadFragment extends Fragment implements TagFragment {
      */
     private void tagRead(@NonNull final CardId id) {
         this.binding.memberId.setText(String.format("%s", id.getMemberId()));
-        this.binding.tagId.setText(BaseEncoding.base16().encode(id.getUid()));
+        this.binding.tagId.setText(BaseEncoding.base16().encode(id.getUid().getUid()));
         this.binding.infoText.setText("");
         setTagText("");
     }

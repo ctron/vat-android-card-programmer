@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import java.time.ZonedDateTime;
 import java.util.function.BiConsumer;
 
-import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CardEntry;
 import de.dentrassi.vat.nfc.programmer.model.CardId;
 import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
 import de.dentrassi.vat.nfc.programmer.nfc.ApplicationIds;
@@ -18,7 +18,7 @@ import de.dentrassi.vat.nfc.programmer.nfc.ops.Reader;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.WriteMad;
 import de.dentrassi.vat.nfc.programmer.nfc.ops.Writer;
 
-public class WriteAction extends TagAction<CreatedCard> {
+public class WriteAction extends TagAction<CardEntry> {
 
     private static final String TAG = WriteAction.class.getName();
 
@@ -43,14 +43,14 @@ public class WriteAction extends TagAction<CreatedCard> {
                        @NonNull final Keys keys,
                        @NonNull final WriteCardInformation information,
                        boolean overwrite,
-                       @NonNull final BiConsumer<CreatedCard, Exception> outcome) {
+                       @NonNull final BiConsumer<CardEntry, Exception> outcome) {
         super(tag, outcome);
         this.overwrite = overwrite;
         this.information = information;
         this.keys = keys;
     }
 
-    protected CreatedCard process() throws Exception {
+    protected CardEntry process() throws Exception {
         Log.i(TAG, "Start writing tag");
 
         final MifareClassic m = getTagAs(MifareClassic::get, "Mifare Classic");
@@ -84,7 +84,7 @@ public class WriteAction extends TagAction<CreatedCard> {
 
             final ZonedDateTime timestamp = ZonedDateTime.now();
 
-            return CreatedCard.of(id, this.information.getAdditional(), timestamp);
+            return CardEntry.ofCreated(id, this.information.getAdditional(), timestamp);
         }
 
     }

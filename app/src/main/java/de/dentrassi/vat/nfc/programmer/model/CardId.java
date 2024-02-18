@@ -2,6 +2,8 @@ package de.dentrassi.vat.nfc.programmer.model;
 
 import androidx.annotation.NonNull;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.Objects;
 
 public class CardId {
@@ -13,12 +15,11 @@ public class CardId {
     /**
      * The tag's UID (max 7 bytes)
      */
-    private final byte[] uid;
+    private final Uid uid;
 
-    private CardId(final int memberId, @NonNull final byte[] uid) throws IllegalArgumentException {
+    private CardId(final int memberId, @NonNull final Uid uid) throws IllegalArgumentException {
         this.memberId = memberId;
-        this.uid = Objects.requireNonNull(uid);
-
+        this.uid = uid;
     }
 
     public int getMemberId() {
@@ -30,8 +31,8 @@ public class CardId {
      *
      * @return A copy of the tag UID
      */
-    public byte[] getUid() {
-        return this.uid.clone();
+    public Uid getUid() {
+        return this.uid;
     }
 
     /**
@@ -43,27 +44,33 @@ public class CardId {
      * @throws IllegalArgumentException if any of the IDs are out of range, or if the tag UID is not between 4 and 7 bytes long.
      */
     public static CardId of(final int memberId, @NonNull final byte[] uid) {
-        if (memberId < 0 || memberId > 999_999) {
-            throw new IllegalArgumentException("Member ID must be between 0 and 999999");
-        }
+        return of(memberId, Uid.of(uid));
+    }
 
-        if (uid.length < 4 || uid.length > 7) {
-            throw new IllegalArgumentException(String.format("UID must be between 4 and 7 bytes (both inclusive), but has a length of: %s", uid.length));
+    /**
+     * Create a new instance
+     *
+     * @param memberId the member id.
+     * @param uid      the tag's UID (4-7 bytes).
+     * @return a new instance
+     * @throws IllegalArgumentException if any of the IDs are out of range, or if the tag UID is not between 4 and 7 bytes long.
+     */
+    public static CardId of(final int memberId, @NonNull final Uid uid) {
+        if (memberId < 0 || memberId > 999_999) {
+            throw new IllegalArgumentException(String.format("Member ID must be between 0 and 999999 (was: %s)", memberId));
         }
 
         return new CardId(memberId, uid);
     }
 
     /**
-     * Check if an ID is empty, all zeroes.
+     * Check if the card is empty, all zeroes (for UID and member ID).
      *
      * @return {@code true} if the card is empty, {@code false} otherwise.
      */
     public boolean isEmpty() {
-        for (byte b : this.uid) {
-            if (b > 0) {
-                return false;
-            }
+        if (!this.uid.isEmpty()) {
+            return false;
         }
 
         return this.memberId == 0;
@@ -76,11 +83,12 @@ public class CardId {
      * @return {@code true} if the UIDs match, {@code false} otherwise.
      */
     public boolean validateUid(byte[] tagId) {
-        int len = Math.max(tagId.length, this.uid.length);
+        var uid = this.uid.getUid();
+        int len = Math.max(tagId.length, uid.length);
 
         for (int i = 0; i < len; i++) {
-            byte a = i >= this.uid.length ? 0 : this.uid[i];
-            byte b = i >= tagId.length ? 0 : tagId[i];
+            final byte a = i >= uid.length ? 0 : uid[i];
+            final byte b = i >= tagId.length ? 0 : tagId[i];
 
             if (a != b) {
                 return false;
@@ -88,5 +96,27 @@ public class CardId {
         }
 
         return true;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("memberId", this.memberId)
+                .add("uid", this.uid)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final CardId cardId = (CardId) o;
+        return this.memberId == cardId.memberId && Objects.equals(this.uid, cardId.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.memberId, this.uid);
     }
 }

@@ -91,7 +91,7 @@ public class WriteMad extends BaseOperation<Void> {
         try {
             // try unprovisioned card first, using the default key as Key A
             writeWithKey(Key.defaultKey(), WithKey.A, Block.Block3, data);
-        } catch (final AuthenticationFailedException e2) {
+        } catch (final AuthenticationFailedException e) {
             // if that fails with an authentication error, try key B
             Log.i(TAG, "Try writing with key B");
             writeWithKey(this.keys.getB(), WithKey.B, Block.Block3, data);

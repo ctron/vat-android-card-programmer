@@ -22,7 +22,7 @@ public final class Plain {
         final ByteBuffer out = ByteBuffer.wrap(new byte[16]);
 
         out.putInt(id.getMemberId());
-        out.put(id.getUid());
+        out.put(id.getUid().getUid());
         // NOTE: if we encode more data, we need to pad this UID to 7 bytes, right now it doesn't matter
 
         // return result

@@ -13,17 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.common.io.BaseEncoding;
-
 import org.jetbrains.annotations.NotNull;
 
 import de.dentrassi.vat.nfc.programmer.MainActivity;
 import de.dentrassi.vat.nfc.programmer.R;
 import de.dentrassi.vat.nfc.programmer.config.Configuration;
-import de.dentrassi.vat.nfc.programmer.data.CreatedCard;
+import de.dentrassi.vat.nfc.programmer.data.CardEntry;
 import de.dentrassi.vat.nfc.programmer.databinding.HomeFragmentBinding;
 import de.dentrassi.vat.nfc.programmer.model.AdditionalInformation;
 import de.dentrassi.vat.nfc.programmer.model.IdType;
+import de.dentrassi.vat.nfc.programmer.model.Uid;
 import de.dentrassi.vat.nfc.programmer.model.WriteCardInformation;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.TagFragment;
@@ -232,7 +231,7 @@ public class HomeFragment extends Fragment implements TagFragment {
     }
 
     @SuppressLint("StringFormatMatches")
-    private void writeComplete(final @Nullable CreatedCard result, @Nullable final Exception ex) {
+    private void writeComplete(final @Nullable CardEntry result, @Nullable final Exception ex) {
         Log.d(TAG, String.format("writeComplete - result: %s, ex: %s", result, ex));
 
         if (ex instanceof WriteAction.AlreadyProvisioned) {
@@ -251,8 +250,8 @@ public class HomeFragment extends Fragment implements TagFragment {
         }
     }
 
-    private void eraseComplete(@Nullable byte[] result, @Nullable final Exception ex) {
-        Log.d(TAG, String.format("erase - result: %s, ex: %s", result == null ? "<null>" : BaseEncoding.base16().encode(result), ex));
+    private void eraseComplete(@Nullable final Uid result, @Nullable final Exception ex) {
+        Log.d(TAG, String.format("erase - result: %s, ex: %s", result == null ? "<null>" : result.toHex(), ex));
 
         if (ex != null) {
             this.binding.writeOutcome.setText(String.format(getString(R.string.message_failed_to_erase), ex.getMessage()));

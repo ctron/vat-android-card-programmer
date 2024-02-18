@@ -2,6 +2,7 @@ package de.dentrassi.vat.nfc.programmer.data;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -22,9 +23,9 @@ import de.dentrassi.vat.nfc.programmer.model.IdType;
 public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<CreatedCardRecyclerViewAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<CreatedCard> entries;
+    private final List<CardEntry> entries;
 
-    public CreatedCardRecyclerViewAdapter(@NonNull final Context context, @NonNull final List<CreatedCard> items) {
+    public CreatedCardRecyclerViewAdapter(@NonNull final Context context, @NonNull final List<CardEntry> items) {
         this.context = context;
         this.entries = items;
     }
@@ -39,9 +40,9 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final CreatedCard item = this.entries.get(position);
+        final CardEntry item = this.entries.get(position);
 
-        holder.uidView.setText(BaseEncoding.base16().encode(item.getId().getUid()));
+        holder.uidView.setText(BaseEncoding.base16().encode(item.getId().getUid().getUid()));
         holder.memberIdView.setText(String.format(Locale.getDefault(), "%06d", item.getId().getMemberId()));
         holder.holderNameView.setText(item.getAdditional().getName());
         holder.holderIdView.setText(item.getAdditional().getId());
@@ -54,6 +55,13 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
 
         holder.timestampView.setText(item.getTimestamp()
                 .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
+
+        if (item.isErased()) {
+            holder.erasedMarkerView.setVisibility(View.VISIBLE);
+        } else {
+            holder.erasedMarkerView.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -68,6 +76,7 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
         public final TextView holderIdView;
         public final TextView holderIdTypeView;
         public final TextView timestampView;
+        public final TextView erasedMarkerView;
 
         public ViewHolder(final DataFragmentItemBinding binding) {
             super(binding.getRoot());
@@ -78,7 +87,7 @@ public class CreatedCardRecyclerViewAdapter extends RecyclerView.Adapter<Created
             this.holderIdView = binding.holderId;
             this.holderIdTypeView = binding.holderIdType;
             this.timestampView = binding.timestamp;
-
+            this.erasedMarkerView = binding.erasedMarker;
         }
     }
 }

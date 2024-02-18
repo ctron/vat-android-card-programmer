@@ -49,6 +49,7 @@
     <string name="header_card_information">Tag Information</string>
     <string name="error_failed_to_write">Failed to write: %s</string>
     <string name="error_already_provisioned">Tag is already provisioned for member: %s. The card must be erased before it can be written again.</string>
+    <string name="marker_erased"><![CDATA[<<erased>>]]></string>
 
     <string-array name="id_types">
         <item>None</item>

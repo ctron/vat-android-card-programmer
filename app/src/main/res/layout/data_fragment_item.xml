@@ -67,6 +67,15 @@
             android:textAppearance="?attr/textAppearanceListItemSecondary"
             tools:text="Drivers License" />
 
+        <TextView
+            android:id="@+id/erased_marker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/marker_erased"
+            android:textAlignment="textEnd"
+            android:textAppearance="?attr/textAppearanceListItemSecondary" />
+
     </LinearLayout>
 
 

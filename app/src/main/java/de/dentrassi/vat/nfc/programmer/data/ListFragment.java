@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,8 +34,6 @@ public class ListFragment extends Fragment {
     private static final String TAG = "ListFragment";
 
     private static final boolean ALLOW_CLEAR = false;
-
-    private final int columnCount = 1;
 
     private RecyclerView recyclerView;
 
@@ -63,15 +60,11 @@ public class ListFragment extends Fragment {
         // list view
 
         final Context context = view.getContext();
-        if (this.columnCount <= 1) {
-            this.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            this.recyclerView.setLayoutManager(new GridLayoutManager(context, this.columnCount));
-        }
+        this.recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         // setup data
 
-        final List<CreatedCard> cards;
+        final List<CardEntry> cards;
         if (getActivity() instanceof MainActivity) {
             cards = ((MainActivity) getActivity()).getCards().getEntries();
         } else {
@@ -123,8 +116,10 @@ public class ListFragment extends Fragment {
     }
 
     private void performClearData() {
-        ((MainActivity) getActivity()).getCards().clear();
-        refreshItems();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).getCards().clear();
+            refreshItems();
+        }
     }
 
     public void refreshItems() {
@@ -141,7 +136,7 @@ public class ListFragment extends Fragment {
             return;
         }
 
-        final CreatedCardsContent cards = ((MainActivity) getActivity()).getCards();
+        final CreatedCardStorage storage = ((MainActivity) getActivity()).getCardStorage();
 
         final String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final String name = "cards-" + timestamp + ".csv";
@@ -149,7 +144,7 @@ public class ListFragment extends Fragment {
         final Uri uri = CsvFileProvider.getUriForFile(
                 context,
                 "de.dentrassi.vat.nfc.programmer.csvProvider", // must align with manifest XML
-                cards.getPath().toFile(),
+                storage.getPath().toFile(),
                 name);
 
         final Intent intent = new Intent();

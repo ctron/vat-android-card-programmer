@@ -7,7 +7,9 @@ import androidx.annotation.NonNull;
 
 import java.io.IOException;
 
+import de.dentrassi.vat.nfc.programmer.nfc.AuthenticationFailedException;
 import de.dentrassi.vat.nfc.programmer.nfc.Block;
+import de.dentrassi.vat.nfc.programmer.nfc.Key;
 import de.dentrassi.vat.nfc.programmer.nfc.Keys;
 import de.dentrassi.vat.nfc.programmer.nfc.SectorTrailer;
 
@@ -40,14 +42,28 @@ public class Eraser extends BaseOperation<Void> {
 
         final byte[] data = SectorTrailer.defaultTrailer().encode();
 
-        // try only with B key
-        writeWithKey(this.keys.getB(), WithKey.B, Block.Block3, data);
+        try {
+            // try with B key first
+            writeWithKey(this.keys.getB(), WithKey.B, Block.Block3, data);
+        } catch (final AuthenticationFailedException ignored) {
+            // next, try with default key
+            writeWithKey(Key.defaultKey(), WithKey.A, Block.Block3, data);
+        }
     }
 
     private void eraseId() throws IOException {
         Log.i(TAG, "eraseId");
 
         // erase the first three blocks
-        writeWithKey(this.keys.getB(), WithKey.B, Block.Block0, new byte[][]{EMPTY_BLOCK, EMPTY_BLOCK, EMPTY_BLOCK});
+
+        final byte[][] data = new byte[][]{EMPTY_BLOCK, EMPTY_BLOCK, EMPTY_BLOCK};
+
+        try {
+            // try with key B first
+            writeWithKey(this.keys.getB(), WithKey.B, Block.Block0, data);
+        } catch (final AuthenticationFailedException ignored) {
+            // next, try with default key
+            writeWithKey(Key.defaultKey(), WithKey.A, Block.Block0, data);
+        }
     }
 }
