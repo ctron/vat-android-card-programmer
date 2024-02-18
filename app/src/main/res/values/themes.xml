@@ -31,4 +31,8 @@
 
     <style name="Theme.VATNFCProgrammer" parent="AppTheme" />
 
+    <style name="Theme.VATNFCProgrammer.Warning" parent="TextAppearance.Design.HelperText">
+        <item name="android:textColor">@color/warning_color</item>
+    </style>
+
 </resources>

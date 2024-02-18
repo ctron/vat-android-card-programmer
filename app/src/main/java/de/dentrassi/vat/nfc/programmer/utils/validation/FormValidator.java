@@ -27,7 +27,11 @@ public class FormValidator {
             }
         }
 
-        if (!(validateGlobal.get() instanceof Ok)) {
+        var result = this.validateGlobal.get();
+        if (result == null) {
+            result = Ok.of();
+        }
+        if (result.isBlocking()) {
             valid = false;
         }
 

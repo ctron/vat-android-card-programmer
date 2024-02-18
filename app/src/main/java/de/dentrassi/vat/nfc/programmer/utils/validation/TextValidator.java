@@ -18,7 +18,7 @@ public abstract class TextValidator implements TextWatcher {
     public TextValidator(@NonNull final TextInputLayout layout, @NonNull final FormValidator validator) {
         this.layout = layout;
         this.validator = validator;
-        validator.contribute(() -> lastResult instanceof Ok);
+        validator.contribute(() -> lastResult.isBlocking());
 
         if (this.layout.getEditText() != null) {
             performValidate(this.layout.getEditText().getText().toString());

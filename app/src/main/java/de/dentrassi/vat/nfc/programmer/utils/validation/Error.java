@@ -14,6 +14,8 @@ public final class Error implements Result {
 
     @Override
     public void apply(@NonNull final TextInputLayout layout) {
+        Result.reset(layout);
+
         layout.setErrorEnabled(true);
         layout.setError(this.message);
     }

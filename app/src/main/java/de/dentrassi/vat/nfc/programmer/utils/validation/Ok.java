@@ -12,8 +12,13 @@ public final class Ok implements Result {
     }
 
     @Override
+    public boolean isBlocking() {
+        return false;
+    }
+
+    @Override
     public void apply(@NonNull final TextInputLayout layout) {
-        layout.setErrorEnabled(false);
+        Result.reset(layout);
     }
 
     public static Result of() {

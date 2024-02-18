@@ -30,11 +30,13 @@ import de.dentrassi.vat.nfc.programmer.nfc.action.EraseAction;
 import de.dentrassi.vat.nfc.programmer.nfc.action.WriteAction;
 import de.dentrassi.vat.nfc.programmer.utils.Editables;
 import de.dentrassi.vat.nfc.programmer.utils.TextWatcherAdapter;
+import de.dentrassi.vat.nfc.programmer.utils.validation.DriversLicense;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Error;
 import de.dentrassi.vat.nfc.programmer.utils.validation.FormValidator;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Ok;
 import de.dentrassi.vat.nfc.programmer.utils.validation.Result;
 import de.dentrassi.vat.nfc.programmer.utils.validation.TextValidator;
+import de.dentrassi.vat.nfc.programmer.utils.validation.Warning;
 
 public class HomeFragment extends Fragment implements TagFragment {
 
@@ -117,8 +119,6 @@ public class HomeFragment extends Fragment implements TagFragment {
         final IdType type = IdType.fromLocalizedText(getContext(), this.binding.holderIdType.getText());
         this.binding.holderIdTypeWrapper.setEnabled(type != IdType.None);
 
-        this.binding.holderIdTypeWrapper.setError(null);
-
         switch (type) {
             case CardNumber:
                 return Result.runWith(this.binding.holderIdTypeWrapper, () -> {
@@ -134,10 +134,27 @@ public class HomeFragment extends Fragment implements TagFragment {
                         return Error.of(String.format(getString(R.string.error_card_number_must_be_a_number_was), cardNumber));
                     }
 
-                    return null;
+                    return Ok.of();
                 });
-            default:
-                break;
+
+            case DriversLicense:
+                return Result.runWith(this.binding.holderIdTypeWrapper, () -> {
+
+                    var cardNumber = Editables.getText(this.binding.holderId.getText());
+                    if (cardNumber.isEmpty()) {
+                        return Error.of(getString(R.string.error_drivers_license_must_not_be_empty));
+                    }
+
+                    if (!DriversLicense.isValidGermanLicenseNumber(cardNumber)) {
+                        return Warning.of("Invalid driver license number");
+                    }
+
+                    return Ok.of();
+                });
+
+            case None:
+            case Other:
+                return Result.runWith(this.binding.holderIdTypeWrapper, Ok::of);
         }
 
         return Ok.of();
