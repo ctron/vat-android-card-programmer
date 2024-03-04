@@ -21,6 +21,7 @@ public class FormValidator {
 
     public void validate() {
         boolean valid = true;
+
         for (var supplier : this.suppliers) {
             if (!supplier.getAsBoolean()) {
                 valid = false;

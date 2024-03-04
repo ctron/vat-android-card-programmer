@@ -51,7 +51,7 @@ public class ReadFragment extends Fragment implements TagFragment {
         if (this.lateReadTag != null) {
             var tag = this.lateReadTag;
             this.lateReadTag = null;
-            this.tagDiscovered(tag);
+            tagDiscovered(tag);
         }
 
         return view;
