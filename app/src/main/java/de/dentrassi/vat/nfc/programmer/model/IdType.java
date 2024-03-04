@@ -2,6 +2,7 @@ package de.dentrassi.vat.nfc.programmer.model;
 
 import android.content.Context;
 import android.text.Editable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,8 @@ public enum IdType {
     CardNumber,
     DriversLicense,
     Other;
+
+    private static final String TAG = IdType.class.getSimpleName();
 
     /**
      * Get the ID type from a localized text.
@@ -40,6 +43,16 @@ public enum IdType {
         }
 
         return IdType.Other;
+    }
+
+    public @NonNull String toLocalizedText(final @NonNull Context context) {
+        final String[] values = context.getResources().getStringArray(R.array.id_types);
+        try {
+            return values[this.ordinal()];
+        } catch (final Exception e) {
+            Log.w(TAG, String.format("Unable to get label for: %s", this), e);
+            return "";
+        }
     }
 
     @NonNull

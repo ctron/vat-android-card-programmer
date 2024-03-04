@@ -60,5 +60,5 @@
     <string name="error_card_number_must_not_be_empty">Kartennummer darf nicht leer sein</string>
     <string name="error_card_number_must_be_a_number_was">Kartennummer muss eine Zahl sein, ist: %s</string>
     <string name="error_drivers_license_must_not_be_empty">Die Führerscheinnummer darf nicht leer sein</string>
-    <string name="error_drivers_license_must_not_be_empty">D</string>
+    <string name="validation_error_member_id_must_be_a_number">Mitgliedernummber muss eine Zahl sein</string>
 </resources>

@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment implements TagFragment {
     private static final String TAG = "MainTab";
 
     private final FormValidator validator = new FormValidator(this::validateInput, ok -> this.binding.startWriteButton.setEnabled(ok));
+    private Prefill latePrefill;
 
     private HomeFragmentBinding binding;
 
@@ -66,6 +67,10 @@ public class HomeFragment extends Fragment implements TagFragment {
     public HomeFragment() {
     }
 
+    public HomeFragment(final Prefill latePrefill) {
+        this.latePrefill = latePrefill;
+    }
+
     @Nullable
     @Override
     public View onCreateView(final @NonNull LayoutInflater inflater, final @Nullable ViewGroup container, final @Nullable Bundle savedInstanceState) {
@@ -76,12 +81,18 @@ public class HomeFragment extends Fragment implements TagFragment {
         this.validator.reset();
 
         this.binding.memberIdInput.setSelectAllOnFocus(true);
-        this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput, validator) {
+        this.binding.memberIdInput.addTextChangedListener(new TextValidator(this.binding.layoutMemberIdInput, this.validator) {
             @Override
             protected @NonNull Result validate(final String value) {
 
                 if (value.isEmpty()) {
                     return Error.of(getString(R.string.validation_error_must_not_be_empty));
+                }
+
+                try {
+                    Integer.parseInt(value);
+                } catch (final Exception e) {
+                    return Error.of(getString(R.string.validation_error_member_id_must_be_a_number));
                 }
 
                 return Ok.of();
@@ -91,14 +102,14 @@ public class HomeFragment extends Fragment implements TagFragment {
         this.binding.holderId.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
-                validator.validate();
+                HomeFragment.this.validator.validate();
             }
         });
 
         this.binding.holderIdType.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(final Editable e) {
-                validator.validate();
+                HomeFragment.this.validator.validate();
             }
         });
 
@@ -109,10 +120,27 @@ public class HomeFragment extends Fragment implements TagFragment {
             this.binding.holderIdType.setText(getContext().getResources().getStringArray(R.array.id_types)[0], false);
         }
 
-        validator.validate();
+        this.validator.validate();
         configChanged();
 
+        if (this.latePrefill != null) {
+            var prefill = this.latePrefill;
+            this.latePrefill = null;
+            prefill(prefill);
+        }
+
         return view;
+    }
+
+    public void prefill(final Prefill prefill) {
+        this.binding.memberIdInput.setText(prefill.getMemberId());
+        this.binding.holderName.setText(prefill.getHolderName());
+        this.binding.holderId.setText(prefill.getHolderId());
+
+        var idType = IdType.fromString(prefill.getHolderIdType());
+        if (getContext() != null) {
+            this.binding.holderIdType.setText(idType.toLocalizedText(getContext()));
+        }
     }
 
     private Result validateInput() {

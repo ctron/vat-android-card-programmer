@@ -47,6 +47,7 @@ import de.dentrassi.vat.nfc.programmer.data.CreatedCardStorage;
 import de.dentrassi.vat.nfc.programmer.data.CreatedCardsContent;
 import de.dentrassi.vat.nfc.programmer.data.ListFragment;
 import de.dentrassi.vat.nfc.programmer.home.HomeFragment;
+import de.dentrassi.vat.nfc.programmer.home.Prefill;
 import de.dentrassi.vat.nfc.programmer.model.Uid;
 import de.dentrassi.vat.nfc.programmer.read.ReadFragment;
 
@@ -73,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
     private CoordinatorLayout coordinatorLayout;
     private Snackbar snackbar;
+
     private Tag lateReadTag;
+    private Prefill latePrefill;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -108,12 +111,11 @@ public class MainActivity extends AppCompatActivity {
                 switch (tab) {
                     default:
                     case Home: {
-                        final HomeFragment result = new HomeFragment();
+                        final HomeFragment result = new HomeFragment(MainActivity.this.latePrefill);
                         MainActivity.this.mainTab = result;
                         return result;
                     }
                     case Read: {
-                        Log.i(TAG, "Create read tab");
                         final ReadFragment result = new ReadFragment(MainActivity.this.lateReadTag);
                         MainActivity.this.readTab = result;
                         return result;
@@ -171,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
         checkConfiguration();
 
         initNfc();
+
+        handleIntent(getIntent());
     }
 
     private void checkConfiguration() {
@@ -224,12 +228,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
 
-        Log.i(TAG, String.format("New Intent: %s", intent));
+        handleIntent(intent);
+    }
+
+    @SuppressWarnings("deprecation")
+    void handleIntent(@NonNull final Intent intent) {
+
+        Log.i(TAG, String.format("Handle Intent: %s", intent));
         Log.i(TAG, String.format("   Action: %s", intent.getAction()));
         Log.i(TAG, String.format("   Data: %s", intent.getData()));
         Log.i(TAG, String.format("   DataString: %s", intent.getDataString()));
@@ -247,33 +256,73 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)) {
-            this.lateReadTag = null;
+        switch (intent.getAction()) {
+            case NfcAdapter.ACTION_TAG_DISCOVERED: {
+                this.lateReadTag = null;
 
-            final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            if (tag == null) {
-                Log.w(TAG, "Tag discovered, but provided no instance");
-                return;
-            }
-
-            var handled = false;
-            if (this.mainTab != null && this.mainTab.isAdded()) {
-                handled = this.mainTab.tagDiscovered(tag);
-                Log.d(TAG, "main tab handled: " + handled);
-            }
-            if (!handled) {
-                if (this.readTab != null && this.readTab.isAdded()) {
-                    handled = this.readTab.tagDiscovered(tag);
-                    Log.d(TAG, "read tab handled: " + handled);
-                } else {
-                    // record that state
-                    this.lateReadTag = tag;
+                final Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                if (tag == null) {
+                    Log.w(TAG, "Tag discovered, but provided no instance");
+                    return;
                 }
-                setCurrentTab(Tabs.Read);
-            }
 
+                var handled = false;
+                if (this.mainTab != null && this.mainTab.isAdded()) {
+                    handled = this.mainTab.tagDiscovered(tag);
+                    Log.d(TAG, "main tab handled: " + handled);
+                }
+                if (!handled) {
+                    if (this.readTab != null && this.readTab.isAdded()) {
+                        handled = this.readTab.tagDiscovered(tag);
+                        Log.d(TAG, "read tab handled: " + handled);
+                    } else {
+                        // record that state
+                        this.lateReadTag = tag;
+                    }
+                    setCurrentTab(Tabs.Read);
+                }
+                break;
+            }
+            case Intent.ACTION_VIEW: {
+                var data = intent.getData();
+                Log.i(TAG, String.format("View data: %s", data));
+                if (data == null) {
+                    return;
+                }
+                var host = data.getHost();
+                if (host == null) {
+                    return;
+                }
+                switch (host) {
+                    case "write": {
+                        prefillWrite(data);
+                        break;
+                    }
+                }
+
+                break;
+            }
         }
 
+    }
+
+    /**
+     * Prefill the write fragment
+     *
+     * @param data the data from the intent
+     */
+    private void prefillWrite(final Uri data) {
+        var prefill = Prefill.of(data);
+
+        if (this.mainTab != null && this.mainTab.isAdded()) {
+            this.latePrefill = null;
+            this.mainTab.prefill(prefill);
+        } else {
+            // record that state
+            this.latePrefill = prefill;
+        }
+
+        setCurrentTab(Tabs.Home);
     }
 
     void notifyCardsChange() {
